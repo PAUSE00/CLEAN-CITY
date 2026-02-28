@@ -8,6 +8,26 @@ $user = 'root';
 $pass = ''; // Vide par défaut avec XAMPP
 $charset = 'utf8mb4';
 
+// Support pour les variables d'environnement de Railway
+if (getenv('MYSQLHOST')) {
+    $host = getenv('MYSQLHOST');
+    if (getenv('MYSQLPORT')) {
+        $host .= ';port=' . getenv('MYSQLPORT');
+    }
+}
+if (getenv('MYSQLDATABASE')) $db = getenv('MYSQLDATABASE');
+if (getenv('MYSQLUSER'))     $user = getenv('MYSQLUSER');
+if (getenv('MYSQLPASSWORD')) $pass = getenv('MYSQLPASSWORD');
+
+// Support alternatif pour l'URL de connexion (MYSQL_URL)
+if (getenv('MYSQL_URL')) {
+    $dbopts = parse_url(getenv('MYSQL_URL'));
+    $host = $dbopts["host"] . ';port=' . $dbopts["port"];
+    $user = $dbopts["user"];
+    $pass = $dbopts["pass"];
+    $db   = ltrim($dbopts["path"], '/');
+}
+
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Remonte les erreurs SQL sous forme d'exceptions
@@ -27,4 +47,3 @@ try {
     ]);
     exit;
 }
-?>
