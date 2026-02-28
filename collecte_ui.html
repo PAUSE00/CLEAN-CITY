@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="VillePropre - Interface de visualisation et d'optimisation des tournées de collecte des déchets.">
+<meta name="theme-color" content="#05080f">
+<title>VillePropre — Optimisation des Tournées</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB5PSIwLjllIiBmb250LXNpemU9IjkwIj7wn5qbPC90ZXh0Pjwvc3ZnPg==" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🚛</div>
+      <div>
+        VillePropre
+        <div class="logo-sub">Système d'Optimisation des Tournées</div>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-btn active" onclick="showPage('overview')">Vue d'ensemble</button>
+      <button class="nav-btn" onclick="showPage('graphe')">N1 · Graphe</button>
+      <button class="nav-btn" onclick="showPage('affectation')">N2 · Affectation</button>
+      <button class="nav-btn" onclick="showPage('temporal')">N3 · Créneaux</button>
+      <div class="nav-btn" onclick="showPage('vrp')">N4 · VRP</div>
+      <div class="nav-btn" onclick="showPage('dynamic')">N5 · Dynamique</div>
+      <div class="nav-btn" onclick="showPage('carte')">N6 · Carte Réelle</div>
+      <a class="nav-btn" href="apprendre_projet_enrichi.html" style="text-decoration:none; color:inherit; display:flex; align-items:center;">Explication Projet</a>
+    </nav>
+  </div>
+</header>
+
+<!-- APP -->
+<div class="app">
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE OVERVIEW
+════════════════════════════════════════════════════════ -->
+<div id="page-overview" class="page active">
+  <div class="hero">
+    <div class="hero-title">Optimisation des Tournées<br>de Collecte</div>
+    <div class="hero-sub">Système progressif en 5 niveaux — du graphe routier à la simulation IoT temps réel</div>
+    <div class="level-pills">
+      <div class="level-pill" onclick="showPage('graphe')"><div class="level-num">1</div>Réseau Routier</div>
+      <div class="level-pill" onclick="showPage('affectation')"><div class="level-num">2</div>Affectation</div>
+      <div class="level-pill" onclick="showPage('temporal')"><div class="level-num">3</div>Créneaux</div>
+      <div class="level-pill" onclick="showPage('vrp')"><div class="level-num">4</div>VRP</div>
+      <div class="level-pill" onclick="showPage('dynamic')"><div class="level-num">5</div>Dynamique</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val">10</div>
+      <div class="stat-label">Points de collecte</div>
+      <div class="stat-badge">📍 Ville</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#3b82f6">
+      <div class="stat-val">3</div>
+      <div class="stat-label">Camions actifs</div>
+      <div class="stat-badge">🚛 Flotte</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#f59e0b">
+      <div class="stat-val">24.2%</div>
+      <div class="stat-label">Réduction distance</div>
+      <div class="stat-badge">📉 Optimisé</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#a855f7">
+      <div class="stat-val">20/20</div>
+      <div class="stat-label">Tests validés</div>
+      <div class="stat-badge">✅ Tous verts</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#ef4444">
+      <div class="stat-val">&lt;1ms</div>
+      <div class="stat-label">Replanification urgence</div>
+      <div class="stat-badge">⚡ Temps réel</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Architecture Progressive</div>
+      <div class="algo-steps">
+        <div class="algo-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Graphe Routier — Dijkstra</h4>
+            <p>Modélise la ville comme un graphe pondéré. Calcule les distances optimales entre tous les points via l'algorithme de Dijkstra O((V+E)logV).</p>
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Graphe Biparti — Affectation Gloutonne</h4>
+            <p>Assigne optimalement les zones aux camions selon capacité et accessibilité. Équilibrage itératif des charges.</p>
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Graphe Triparti — Contraintes Temporelles</h4>
+            <p>Ajoute la dimension temps : fenêtres horaires, pauses obligatoires, congestion. Planification hebdomadaire.</p>
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>VRP — 2-opt + Recherche Tabou</h4>
+            <p>Génère les trajets concrets. Construction par plus-proche-voisin, amélioration 2-opt, optimisation globale Tabou.</p>
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h4>Système Dynamique — NSGA-II + IoT</h4>
+            <p>Simulation temps réel : capteurs IoT, événements aléatoires, multi-objectif Pareto. Replanification automatique.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent3)"></span>Résultats Globaux</div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px">Amélioration distance (Tabou)</span>
+          <span style="font-family:'Space Mono',monospace;color:var(--accent);font-size:13px">24.2%</span>
+        </div>
+        <div class="improvement-bar"><div class="improvement-fill" id="bar1" style="width:24.2%"></div></div>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px">2-opt amélioration locale</span>
+          <span style="font-family:'Space Mono',monospace;color:var(--accent);font-size:13px">22.6%</span>
+        </div>
+        <div class="improvement-bar"><div class="improvement-fill" id="bar2" style="width:22.6%"></div></div>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px">Taux utilisation camions</span>
+          <span style="font-family:'Space Mono',monospace;color:var(--accent3);font-size:13px">~88%</span>
+        </div>
+        <div class="improvement-bar"><div class="improvement-fill" id="bar3" style="width:88%;background:linear-gradient(90deg,var(--accent3),var(--accent4))"></div></div>
+      </div>
+      <div style="margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px">Couverture tests unitaires</span>
+          <span style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:13px">100%</span>
+        </div>
+        <div class="improvement-bar"><div class="improvement-fill" id="bar4" style="width:100%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
+      </div>
+
+      <div style="background:var(--bg3);border-radius:10px;padding:16px;border:1px solid var(--border)">
+        <div class="card-title" style="margin-bottom:10px"><span class="dot" style="background:#a855f7"></span>Barème Évaluation</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+            <div style="flex:1">Niveaux 1–5</div>
+            <div style="width:80px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="width:80%;height:100%;background:var(--accent);border-radius:2px"></div></div>
+            <div style="color:var(--muted);min-width:30px;text-align:right">80%</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+            <div style="flex:1">Qualité code</div>
+            <div style="width:80px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="width:50%;height:100%;background:var(--accent3);border-radius:2px"></div></div>
+            <div style="color:var(--muted);min-width:30px;text-align:right">10%</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+            <div style="flex:1">Tests unitaires</div>
+            <div style="width:80px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="width:25%;height:100%;background:var(--accent2);border-radius:2px"></div></div>
+            <div style="color:var(--muted);min-width:30px;text-align:right">5%</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+            <div style="flex:1">Rapport technique</div>
+            <div style="width:80px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="width:25%;height:100%;background:#a855f7;border-radius:2px"></div></div>
+            <div style="color:var(--muted);min-width:30px;text-align:right">5%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE N1 — GRAPHE ROUTIER
+════════════════════════════════════════════════════════ -->
+<div id="page-graphe" class="page">
+  <div class="stats-row">
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val">10</div><div class="stat-label">Sommets (points)</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#3b82f6">
+      <div class="stat-val">15</div><div class="stat-label">Arêtes (routes)</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val">Oui</div><div class="stat-label">Graphe connexe</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#f59e0b">
+      <div class="stat-val">O((V+E)logV)</div><div class="stat-label">Complexité Dijkstra</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Carte du Réseau Routier</div>
+      <svg id="map-svg" viewBox="-1 -1 12 11" width="100%" height="100%">
+        <defs>
+          <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.2)"/>
+          </marker>
+        </defs>
+      </svg>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+          <div style="width:10px;height:10px;background:#00d4aa;border-radius:50%"></div> Dépôt central
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+          <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%"></div> Points de collecte
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+          <div style="width:20px;height:2px;background:rgba(255,255,255,0.15)"></div> Route
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+          <div style="width:20px;height:2px;background:#00d4aa"></div> Chemin optimal
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent3)"></span>Calculer Plus Court Chemin</div>
+      <div class="control-row">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Départ</div>
+          <select id="sel-from" onchange="updatePath()">
+            <option value="0">0 — Dépôt</option>
+            <option value="1">1 — Quartier Nord</option>
+            <option value="2">2 — Centre Ville</option>
+            <option value="3">3 — Zone Industrielle</option>
+            <option value="4">4 — Quartier Est</option>
+            <option value="5">5 — Quartier Ouest</option>
+            <option value="6">6 — Zone Commerciale</option>
+            <option value="7">7 — Quartier Sud</option>
+            <option value="8">8 — Zone Résidentielle</option>
+            <option value="9">9 — Nouveau Quartier</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Arrivée</div>
+          <select id="sel-to" onchange="updatePath()">
+            <option value="0">0 — Dépôt</option>
+            <option value="1">1 — Quartier Nord</option>
+            <option value="2">2 — Centre Ville</option>
+            <option value="3">3 — Zone Industrielle</option>
+            <option value="4" selected>4 — Quartier Est</option>
+            <option value="5">5 — Quartier Ouest</option>
+            <option value="6">6 — Zone Commerciale</option>
+            <option value="7">7 — Quartier Sud</option>
+            <option value="8">8 — Zone Résidentielle</option>
+            <option value="9">9 — Nouveau Quartier</option>
+          </select>
+        </div>
+      </div>
+      <div class="path-result" id="path-result">
+        <div style="font-size:12px;color:var(--muted)">Distance optimale</div>
+        <div class="path-dist" id="path-dist">—</div>
+        <div class="path-nodes" id="path-nodes"></div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="card-title" style="margin-bottom:10px"><span class="dot" style="background:var(--accent2)"></span>Algorithme Dijkstra — Étapes</div>
+        <div class="algo-steps">
+          <div class="algo-step"><div class="step-num">1</div><div class="step-body"><h4>Initialisation</h4><p>dist[source]=0, dist[tous les autres]=∞. File de priorité avec (0, source).</p></div></div>
+          <div class="algo-step"><div class="step-num">2</div><div class="step-body"><h4>Exploration</h4><p>Extraire le sommet u de distance minimale. Pour chaque voisin v : si dist[u]+w(u,v) &lt; dist[v] → mettre à jour.</p></div></div>
+          <div class="algo-step"><div class="step-num">3</div><div class="step-body"><h4>Reconstruction</h4><p>Remonter les prédécesseurs de l'arrivée vers le départ pour retrouver le chemin.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Matrice des Distances (km) — Survoler pour comparer</div>
+    <div class="matrix-wrap">
+      <table class="matrix" id="matrix-table"></table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE N2 — AFFECTATION
+════════════════════════════════════════════════════════ -->
+<div id="page-affectation" class="page">
+  <div class="stats-row">
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val">3</div><div class="stat-label">Camions disponibles</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#3b82f6">
+      <div class="stat-val">6</div><div class="stat-label">Zones à couvrir</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#f59e0b">
+      <div class="stat-val">0</div><div class="stat-label">Zones non affectées</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val">&lt;20%</div><div class="stat-label">Écart-type charges</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Graphe Biparti — Camions ↔ Zones</div>
+      <svg id="bipartite-svg" viewBox="0 0 500 350" style="width:100%;height:350px;display:block"></svg>
+      <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+          <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%"></div> Camions
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+          <div style="width:10px;height:10px;background:#f59e0b;border-radius:50%"></div> Zones
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+          <div style="width:20px;height:2px;background:#00d4aa"></div> Affectation active
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>Résultat de l'Affectation</div>
+      <div class="truck-grid" id="truck-grid"></div>
+      <div style="margin-top:16px;background:var(--bg3);border-radius:10px;padding:14px;border:1px solid var(--border)">
+        <div class="card-title" style="margin-bottom:8px"><span class="dot" style="background:var(--accent3)"></span>Algorithme Glouton</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--text)">1.</strong> Trier les zones par volume décroissant<br>
+          <strong style="color:var(--text)">2.</strong> Pour chaque zone → choisir le camion accessible le moins chargé<br>
+          <strong style="color:var(--text)">3.</strong> Vérifier capacité avant d'affecter<br>
+          <strong style="color:var(--text)">4.</strong> Phase d'équilibrage : déplacer zones pour réduire l'écart-type
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE N3 — CRÉNEAUX TEMPORELS
+════════════════════════════════════════════════════════ -->
+<div id="page-temporal" class="page">
+  <div class="stats-row">
+    <div class="stat-card" style="--accent-c:#f59e0b">
+      <div class="stat-val">9</div><div class="stat-label">Créneaux disponibles</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val">5</div><div class="stat-label">Jours planifiés</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#3b82f6">
+      <div class="stat-val">100%</div><div class="stat-label">Respect des horaires</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#f59e0b">
+      <div class="stat-val">1.0</div><div class="stat-label">Congestion moyenne</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent3)"></span>Planning Hebdomadaire</div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Graphe Triparti — Contraintes</div>
+      <svg id="tripartite-svg" viewBox="0 0 480 360" style="width:100%;height:360px;display:block"></svg>
+      <div style="margin-top:12px;background:var(--bg3);border-radius:10px;padding:14px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <span style="color:var(--accent)">●</span> <strong style="color:var(--text)">Fenêtres horaires</strong> : chaque zone a une plage d'accessibilité<br>
+          <span style="color:var(--accent3)">●</span> <strong style="color:var(--text)">Pauses camion</strong> : pause déjeuner 12h-13h obligatoire<br>
+          <span style="color:var(--accent4)">●</span> <strong style="color:var(--text)">Congestion</strong> : coefficient 1.0→2.0 selon l'heure<br>
+          <span style="color:var(--accent2)">●</span> <strong style="color:var(--text)">Anti-chevauchement</strong> : un camion ne peut pas avoir 2 zones simultanément
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE N4 — VRP
+════════════════════════════════════════════════════════ -->
+<div id="page-vrp" class="page">
+  <div class="stats-row">
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val" id="vrp-init-dist">50.63 km</div><div class="stat-label">Distance initiale</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#3b82f6">
+      <div class="stat-val" id="vrp-opt-dist">38.39 km</div><div class="stat-label">Distance optimisée</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#f59e0b">
+      <div class="stat-val" id="vrp-improv">24.2%</div><div class="stat-label">Amélioration totale</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val">100 iter</div><div class="stat-label">Recherche Tabou</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Visualisation des Tournées</div>
+      <div class="control-row">
+        <button class="btn btn-secondary" onclick="showVRP('init')">📍 Solution initiale</button>
+        <button class="btn btn-primary" onclick="showVRP('opt')">⚡ Solution optimisée</button>
+      </div>
+      <svg id="vrp-svg" viewBox="-1 -1 12 11"></svg>
+      <div id="vrp-legend" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent3)"></span>Algorithmes d'Optimisation</div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px">Plus proche voisin (init)</span>
+          <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)">50.63 km</span>
+        </div>
+        <div class="improvement-bar"><div style="width:100%;height:100%;background:rgba(255,255,255,0.15);border-radius:4px"></div></div>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px">Après 2-opt</span>
+          <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--accent3)">38.39 km</span>
+        </div>
+        <div class="improvement-bar"><div id="bar-2opt" class="improvement-fill" style="width:75.8%;background:linear-gradient(90deg,var(--accent3),var(--accent))"></div></div>
+      </div>
+      <div style="margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px">Après Tabou (100 iter)</span>
+          <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--accent)">38.39 km</span>
+        </div>
+        <div class="improvement-bar"><div id="bar-tabou" class="improvement-fill" style="width:75.8%"></div></div>
+      </div>
+
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;border:1px solid var(--border);margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:8px"><span class="dot"></span>2-opt — Principe</div>
+        <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.8">
+          Avant : A → <span style="color:var(--accent4)">B → C</span> → D<br>
+          Si d(A,C)+d(B,D) &lt; d(A,B)+d(C,D) :<br>
+          Après : A → <span style="color:var(--accent)">C → B</span> → D ✓
+        </div>
+      </div>
+
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;border:1px solid var(--border)">
+        <div class="card-title" style="margin-bottom:8px"><span class="dot" style="background:var(--accent2)"></span>Recherche Tabou — Principe</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          Liste tabou de taille 10 → interdit de refaire les derniers mouvements.<br>
+          Accepte des solutions légèrement pires pour <strong style="color:var(--text)">sortir des minima locaux</strong>.<br>
+          Arrêt : 100 itérations ou 15 sans amélioration.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gantt -->
+  <div class="card" style="margin-top:20px">
+    <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>Diagramme de Gantt des Tournées</div>
+    <svg id="gantt-svg" viewBox="0 0 900 160" style="width:100%;height:160px;display:block"></svg>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE N5 — SYSTÈME DYNAMIQUE
+════════════════════════════════════════════════════════ -->
+<div id="page-dynamic" class="page">
+  <div class="sim-controls">
+    <button class="btn btn-primary" onclick="startSim()" id="sim-start-btn">▶ Lancer Simulation</button>
+    <button class="btn btn-secondary" onclick="pauseSim()" id="sim-pause-btn" disabled>⏸ Pause</button>
+    <button class="btn btn-secondary" onclick="resetSim()">↺ Réinitialiser</button>
+    <div style="margin-left:10px">
+      <span style="font-size:11px;color:var(--muted)">Vitesse</span>
+      <input type="range" min="1" max="10" value="5" id="sim-speed" style="width:80px;margin-left:8px">
+    </div>
+    <div id="sim-events" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    <div class="sim-time" id="sim-time">08:00</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card" style="--accent-c:#ef4444">
+      <div class="stat-val" id="iot-urgent">0</div><div class="stat-label">Points urgents (&gt;90%)</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#f59e0b">
+      <div class="stat-val" id="iot-alert">0</div><div class="stat-label">Points en alerte (&gt;80%)</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#00d4aa">
+      <div class="stat-val" id="iot-avg">—</div><div class="stat-label">Niveau moyen</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#3b82f6">
+      <div class="stat-val" id="replan-count">0</div><div class="stat-label">Replanifications</div>
+    </div>
+    <div class="stat-card" style="--accent-c:#a855f7">
+      <div class="stat-val" id="co2-count">0 kg</div><div class="stat-label">CO2 estimé</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent4)"></span>Capteurs IoT — Niveaux de Remplissage</div>
+      <div class="iot-grid" id="iot-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>Front de Pareto — Multi-Objectif</div>
+      <svg id="pareto-svg" viewBox="0 0 400 280" style="width:100%;height:280px;display:block"></svg>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">
+        <strong style="color:var(--text)">Dominance :</strong> A domine B si A est meilleure sur <em>tous</em> les critères et strictement meilleure sur au moins un.<br>
+        Les solutions <span style="color:var(--accent)">● vertes</span> sur le front sont <strong>non-dominées</strong>.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:20px">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent3)"></span>Journal de Simulation</div>
+      <div class="log-box" id="sim-log">
+        <div class="log-line">Système prêt. Appuyez sur ▶ pour démarrer...</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent4)"></span>Alertes Actives</div>
+      <div id="alerts-list" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Aucune alerte active</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE N6 — CARTE RÉELLE (Leaflet + OSRM)
+════════════════════════════════════════════════════════ -->
+<div id="page-carte" class="page">
+  <div class="grid-2" style="margin-bottom:20px; grid-template-columns: 1fr;">
+    <div class="card" style="padding:0; overflow:hidden; border:1px solid rgba(255,255,255,0.08);">
+      <div id="real-map" style="width:100%; height:600px; background:#1e293b;"></div>
+    </div>
+  </div>
+  <div class="grid-2" style="grid-template-columns: 1fr;">
+    <div class="card">
+        <div class="card-title"><span class="dot" style="background:#00d4aa"></span>Détails du CVRP Réel</div>
+        <div style="color:var(--muted); font-size:13px; line-height:1.6; margin-bottom:15px;">
+            Les itinéraires ci-dessus sont calculés selon le <b>Capacitated Vehicle Routing Problem (CVRP)</b> et affichés en utilisant <b>OSRM</b> pour épouser le véritable réseau routier d'Agadir.
+        </div>
+        <div id="real-map-legend" style="display:flex; flex-direction:column; gap:10px;"></div>
+    </div>
+  </div>
+</div>
+
+<footer style="margin-top: 60px; padding: 30px 0; text-align: center; border-top: 1px solid var(--border-glow); color: var(--muted); font-size: 13px;">
+  &copy; 2026 VillePropre · Optimisation algorithmique et Systèmes Intelligents
+</footer>
+
+</div><!-- end .app -->
+
+<script src="js/app.js"></script>
+</body>
+</html>

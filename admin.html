@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Administration VillePropre - Gestion de la flotte, des zones et des affectations.">
+  <meta name="theme-color" content="#05080f">
+  <title>Admin - VillePropre</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB5PSIwLjllIiBmb250LXNpemU9IjkwIj7wn5qbPC90ZXh0Pjwvc3ZnPg==" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { padding-top: 100px; display: flex; justify-content: center; flex-direction: column; align-items: center; gap: 30px; padding-bottom: 50px;}
+    .admin-container {
+        width: 100%;
+        max-width: 800px;
+        background: rgba(15,23,42,0.6);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 40px;
+        backdrop-filter: blur(20px);
+    }
+    input, select {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: inherit;
+        outline: none;
+    }
+    input[type="number"] { font-family: 'Space Mono', monospace; width: 100px; margin-right: 15px; }
+    .data-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    button {
+        background: var(--accent);
+        color: var(--bg);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+    button.danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    button.danger:hover { background: #ef4444; color: white; }
+    button:hover:not(.danger) { filter: brightness(1.2); }
+    
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; margin: 2px; }
+    
+    #toast {
+        position: fixed;
+        bottom: 20px; right: 20px;
+        padding: 15px 25px;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 8px;
+        font-weight: 600;
+        opacity: 0;
+        transition: 0.3s;
+        pointer-events: none;
+        z-index: 9999;
+    }
+
+    .admin-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+    .admin-tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--muted); font-weight: 600;}
+    .admin-tab.active { border-bottom-color: var(--accent); color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="logo">
+    <div class="logo-icon">🚛</div>
+    <div>
+      <div>VillePropre Admin</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:400;text-transform:uppercase;letter-spacing:0.5px">Panneau de Contrôle</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="window.location.href='collecte_ui.html'">← Retour au Dashboard</div>
+  </div>
+</div>
+
+<div class="admin-container" style="padding-bottom: 0;">
+    <div class="admin-nav">
+        <div class="admin-tab active" onclick="switchTab('tab-fleet', event)">Flotte (Camions)</div>
+        <div class="admin-tab" onclick="switchTab('tab-zones', event)">Zones (Volumes)</div>
+        <div class="admin-tab" onclick="switchTab('tab-assign', event)">Affectations</div>
+    </div>
+</div>
+
+<!-- TAB 1: FLEET -->
+<div id="tab-fleet" class="admin-container tab-content active">
+    <h2>Gestion des Capacités des Camions</h2>
+    <p style="color:var(--muted); margin-bottom:30px;">Mettez à jour dynamiquement la capacité de transport des véhicules.</p>
+    <div id="trucks-list"><div style="color:var(--muted)">Chargement...</div></div>
+</div>
+
+<!-- TAB 2: ZONES -->
+<div id="tab-zones" class="admin-container tab-content">
+    <h2>Gestion des Volumes de Collecte</h2>
+    <p style="color:var(--muted); margin-bottom:30px;">Modifiez le volume de déchets attendu par zone de collecte.</p>
+    <div id="zones-list"><div style="color:var(--muted)">Chargement...</div></div>
+</div>
+
+<!-- TAB 3: ASSIGNMENTS -->
+<div id="tab-assign" class="admin-container tab-content">
+    <h2>Affectations Camions ↔ Zones</h2>
+    <p style="color:var(--muted); margin-bottom:30px;">Gérez la distribution des zones aux différents véhicules de la flotte.</p>
+    
+    <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:10px; margin-bottom: 30px; display:flex; gap:15px; align-items:flex-end;">
+        <div>
+            <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:5px;">Sélectionner Camion</label>
+            <select id="assign-camion-sel"></select>
+        </div>
+        <div>
+            <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:5px;">Nouvelle Zone</label>
+            <select id="assign-zone-sel"></select>
+        </div>
+        <button onclick="handleAssign()">+ Ajouter l'Affectation</button>
+    </div>
+
+    <div id="assign-list"><div style="color:var(--muted)">Chargement...</div></div>
+</div>
+
+<div id="toast">Message</div>
+
+<script>
+    let globalCamions = [];
+    let globalZones = [];
+
+    async function fetchData() {
+        try {
+            const [fleetRes, zonesRes] = await Promise.all([
+                fetch('api/trucks.php').then(r => r.json()),
+                fetch('api/zones.php').then(r => r.json())
+            ]);
+            
+            if(fleetRes.success) globalCamions = fleetRes.camions;
+            if(zonesRes.success) {
+                // Remove depot from list (id 0)
+                globalZones = zonesRes.zones.filter(z => z.id !== 0); 
+            }
+
+            renderAll();
+        } catch(e) {
+            console.error(e);
+            showToast("Erreur de connexion serveur");
+        }
+    }
+
+    function renderAll() {
+        renderTrucksList();
+        renderZonesList();
+        renderAssignList();
+        populateSelects();
+    }
+
+    // --- TAB SWITCHING ---
+    function switchTab(tabId, ev) {
+        document.querySelectorAll('.admin-tab').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        if(ev) ev.target.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    // --- TRUCKS ---
+    function renderTrucksList() {
+        const trList = document.getElementById('trucks-list');
+        trList.innerHTML = '';
+        globalCamions.forEach(c => {
+            trList.innerHTML += `
+                <div class="data-row">
+                    <div style="font-size:24px; margin-right:20px">${c.icon}</div>
+                    <div style="flex:1">
+                        <div style="font-weight:700; color:${c.color}; margin-bottom:5px">Camion ID ${c.id}</div>
+                    </div>
+                    <div>
+                        <span style="font-size:12px; color:var(--muted); margin-right:10px">Capacité :</span>
+                        <input type="number" id="t-cap-${c.id}" value="${c.cap}" />
+                    </div>
+                    <button onclick="updateTruck(${c.id})">Sauvegarder</button>
+                </div>
+            `;
+        });
+    }
+
+    async function updateTruck(id) {
+        const cap = document.getElementById(`t-cap-${id}`).value;
+        try {
+            const res = await fetch('api/update_truck.php', { method: 'POST', body: JSON.stringify({ id, cap }) }).then(r => r.json());
+            if (res.success) showToast("Camion " + id + " mis à jour !");
+            else alert("Erreur: " + res.error);
+        } catch(e) { alert("Erreur réseau"); }
+    }
+
+    // --- ZONES ---
+    function renderZonesList() {
+        const zl = document.getElementById('zones-list');
+        zl.innerHTML = '';
+        globalZones.forEach(z => {
+            zl.innerHTML += `
+                <div class="data-row">
+                    <div style="flex:1">
+                        <div style="font-weight:700; margin-bottom:5px">${z.nom} <span style="color:var(--muted);font-weight:400;font-size:12px;">(ID: ${z.id})</span></div>
+                    </div>
+                    <div>
+                        <span style="font-size:12px; color:var(--muted); margin-right:10px">Volume attendu :</span>
+                        <input type="number" id="z-vol-${z.id}" value="${z.vol}" />
+                    </div>
+                    <button onclick="updateZone(${z.id})">Sauvegarder</button>
+                </div>
+            `;
+        });
+    }
+
+    async function updateZone(id) {
+        const vol = document.getElementById(`z-vol-${id}`).value;
+        try {
+            const res = await fetch('api/update_zone.php', { method: 'POST', body: JSON.stringify({ id, vol }) }).then(r => r.json());
+            if (res.success) showToast("Zone " + id + " mise à jour !");
+            else alert("Erreur: " + res.error);
+        } catch(e) { alert("Erreur réseau"); }
+    }
+
+    // --- ASSIGNMENTS ---
+    function populateSelects() {
+        const cSel = document.getElementById('assign-camion-sel');
+        const zSel = document.getElementById('assign-zone-sel');
+        cSel.innerHTML = globalCamions.map(c => `<option value="${c.id}">Camion ${c.id} ${c.icon}</option>`).join('');
+        zSel.innerHTML = globalZones.map(z => `<option value="${z.id}">${z.nom}</option>`).join('');
+    }
+
+    function renderAssignList() {
+        const al = document.getElementById('assign-list');
+        al.innerHTML = '';
+        globalCamions.forEach(c => {
+            const badges = c.zones.map(zid => {
+                const zName = globalZones.find(z => z.id === zid)?.nom || 'Zone '+zid;
+                return `<div class="badge" style="background:${c.color}20; color:${c.color}; border:1px solid ${c.color}40; margin-right:5px; margin-bottom:5px;">
+                            ${zName} 
+                            <span style="cursor:pointer; margin-left:5px; opacity:0.6 hover:opacity:1" onclick="handleUnassign(${c.id}, ${zid})">✖</span>
+                        </div>`;
+            }).join('');
+
+            al.innerHTML += `
+                <div class="data-row" style="flex-direction: column; align-items: flex-start;">
+                    <div style="font-weight:700; color:${c.color}; margin-bottom:10px">${c.icon} Camion ID ${c.id}</div>
+                    <div style="display:flex; flex-wrap:wrap; width:100%;">
+                        ${badges.length ? badges : '<span style="color:var(--muted);font-size:12px;font-style:italic">Aucune affectation</span>'}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    async function handleAssign() {
+        const cid = document.getElementById('assign-camion-sel').value;
+        const zid = document.getElementById('assign-zone-sel').value;
+        try {
+            const res = await fetch('api/assign_zone.php', { method: 'POST', body: JSON.stringify({ camion_id: cid, zone_id: zid, action: 'assign' }) }).then(r => r.json());
+            if (res.success) { showToast(res.message); fetchData(); }
+            else alert("Erreur: " + res.error);
+        } catch(e) { alert("Erreur réseau"); }
+    }
+
+    async function handleUnassign(cid, zid) {
+        if(!confirm("Désassigner la Zone " + zid + " du Camion " + cid + " ?")) return;
+        try {
+            const res = await fetch('api/assign_zone.php', { method: 'POST', body: JSON.stringify({ camion_id: cid, zone_id: zid, action: 'unassign' }) }).then(r => r.json());
+            if (res.success) { showToast(res.message); fetchData(); }
+            else alert("Erreur: " + res.error);
+        } catch(e) { alert("Erreur réseau"); }
+    }
+
+    // --- UTILS ---
+    let toastTimeout;
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.style.opacity = '0', 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchData);
+</script>
+
+</body>
+</html>

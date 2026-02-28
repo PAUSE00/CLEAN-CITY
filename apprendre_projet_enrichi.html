@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Guide interactif VillePropre: Comprendre les heuristiques d'optimisation (Dijkstra, Tabou, VRP).">
+<meta name="theme-color" content="#05080f">
+<title>Guide Interactif — Comprendre chaque étape</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB5PSIwLjllIiBmb250LXNpemU9IjkwIj7wn5qbPC90ZXh0Pjwvc3ZnPg==" />
+<link rel="stylesheet" href="css/explication.css">
+</head>
+<body>
+<div class="layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div style="margin-bottom: 20px;">
+      <a href="index.html" style="text-decoration:none; color:var(--muted); font-size: 13px; font-family:'DM Sans', sans-serif; display:flex; align-items:center; gap: 8px; transition: color 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">
+        <span>←</span> Retour à l'accueil
+      </a>
+    </div>
+    <h1>🎓 Guide Interactif</h1>
+    <p>Comprendre chaque étape</p>
+  </div>
+  <div style="--lc:var(--n1)">
+    <div class="level-header" onclick="toggleLevel('l1',this)">
+      <div class="level-dot" style="background:var(--n1);color:#07080f">1</div>N1 · Graphe Routier
+    </div>
+    <div class="step-links" id="links-l1">
+      <a class="step-link" href="#l1s1">Qu'est-ce qu'un graphe ?</a>
+      <a class="step-link" href="#l1s2">Modéliser en Python</a>
+      <a class="step-link" href="#l1s3">Distance euclidienne</a>
+      <a class="step-link" href="#l1s4">Dijkstra pas à pas</a>
+      <a class="step-link" href="#l1s5">Matrice des distances</a>
+    </div>
+  </div>
+  <div style="--lc:var(--n2)">
+    <div class="level-header" onclick="toggleLevel('l2',this)">
+      <div class="level-dot" style="background:var(--n2);color:#07080f">2</div>N2 · Affectation
+    </div>
+    <div class="step-links" id="links-l2">
+      <a class="step-link" href="#l2s1">Graphe biparti</a>
+      <a class="step-link" href="#l2s2">Contrainte capacité</a>
+      <a class="step-link" href="#l2s3">Algorithme glouton</a>
+      <a class="step-link" href="#l2s4">Équilibrage charges</a>
+    </div>
+  </div>
+  <div style="--lc:var(--n3)">
+    <div class="level-header" onclick="toggleLevel('l3',this)">
+      <div class="level-dot" style="background:var(--n3);color:#07080f">3</div>N3 · Créneaux
+    </div>
+    <div class="step-links" id="links-l3">
+      <a class="step-link" href="#l3s1">Graphe triparti</a>
+      <a class="step-link" href="#l3s2">Fenêtres horaires</a>
+      <a class="step-link" href="#l3s3">Détection chevauchement</a>
+      <a class="step-link" href="#l3s4">Planning semaine</a>
+    </div>
+  </div>
+  <div style="--lc:var(--n4)">
+    <div class="level-header" onclick="toggleLevel('l4',this)">
+      <div class="level-dot" style="background:var(--n4);color:#07080f">4</div>N4 · VRP
+    </div>
+    <div class="step-links" id="links-l4">
+      <a class="step-link" href="#l4s1">Problème VRP</a>
+      <a class="step-link" href="#l4s2">Plus proche voisin</a>
+      <a class="step-link" href="#l4s3">Algorithme 2-opt</a>
+      <a class="step-link" href="#l4s4">Recherche Tabou</a>
+    </div>
+  </div>
+  <div style="--lc:var(--n5)">
+    <div class="level-header" onclick="toggleLevel('l5',this)">
+      <div class="level-dot" style="background:var(--n5);color:#07080f">5</div>N5 · Dynamique
+    </div>
+    <div class="step-links" id="links-l5">
+      <a class="step-link" href="#l5s1">Capteurs IoT</a>
+      <a class="step-link" href="#l5s2">Simulation temps réel</a>
+      <a class="step-link" href="#l5s3">Multi-objectif Pareto</a>
+      <a class="step-link" href="#l5s4">Dominance Pareto</a>
+    </div>
+  </div>
+  <!-- NOUVELLES SECTIONS -->
+  <div style="--lc:#e2c96e">
+    <div class="level-header" onclick="toggleLevel('ljson',this)">
+      <div class="level-dot" style="background:#e2c96e;color:#07080f">📄</div>Formats JSON
+    </div>
+    <div class="step-links" id="links-ljson">
+      <a class="step-link" href="#js1">input/output N1</a>
+      <a class="step-link" href="#js2">input/output N2</a>
+      <a class="step-link" href="#js3">input/output N3</a>
+      <a class="step-link" href="#js4">input/output N4</a>
+      <a class="step-link" href="#js5">input/output N5</a>
+    </div>
+  </div>
+  <div style="--lc:#38bdf8">
+    <div class="level-header" onclick="toggleLevel('larch',this)">
+      <div class="level-dot" style="background:#38bdf8;color:#07080f">🗂</div>Architecture
+    </div>
+    <div class="step-links" id="links-larch">
+      <a class="step-link" href="#arch1">Arborescence</a>
+      <a class="step-link" href="#arch2">Module commun</a>
+      <a class="step-link" href="#arch3">Réutilisation</a>
+      <a class="step-link" href="#arch4">Tests & Barème</a>
+    </div>
+  </div>
+  <div style="--lc:#f87171">
+    <div class="level-header" onclick="toggleLevel('lcode',this)">
+      <div class="level-dot" style="background:#f87171;color:#07080f">🔧</div>Méthodes manquantes
+    </div>
+    <div class="step-links" id="links-lcode">
+      <a class="step-link" href="#mc1">calculer_penalite()</a>
+      <a class="step-link" href="#mc2">Tournee — méthodes</a>
+      <a class="step-link" href="#mc3">recherche_tabou()</a>
+      <a class="step-link" href="#mc4">Dashboard & Replan.</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+<div class="main-inner">
+
+<!-- ══════════════════ N1 ══════════════════ -->
+<section class="level-section" style="--lc:var(--n1)">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(34,211,238,.07),transparent);border:1px solid rgba(34,211,238,.15)">
+    <div class="level-badge" style="background:rgba(34,211,238,.12);color:var(--n1)">
+      <span style="width:18px;height:18px;background:var(--n1);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">1</span>
+      NIVEAU 1 — RÉSEAU ROUTIER
+    </div>
+    <div class="level-title">Modéliser la ville comme un graphe</div>
+    <div class="level-desc">On veut trouver le chemin le plus court entre n'importe quels deux points de collecte. Pour ça, on modélise le réseau routier comme un <strong>graphe pondéré</strong> et on utilise l'algorithme de <strong>Dijkstra</strong>.</div>
+    <div class="level-goal">🎯 <strong>Objectif :</strong> Calculer la matrice 10×10 des distances optimales entre tous les points (dépôt + 9 quartiers).</div>
+  </div>
+
+  <!-- 1.1 -->
+  <div class="step" id="l1s1">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div class="step-title-group"><h3>Qu'est-ce qu'un graphe ?</h3><p>La structure de données de base du projet</p></div>
+    </div>
+    <div class="explain-row">
+      <div class="explain-card"><h4>Sommet (Nœud)</h4><p>Un point dans le graphe. Ici : le dépôt (id=0) ou un quartier de collecte.</p></div>
+      <div class="explain-card"><h4>Arête</h4><p>Une connexion entre deux sommets. Ici : une route qui relie deux points de collecte.</p></div>
+      <div class="explain-card"><h4>Poids</h4><p>La valeur associée à une arête. Ici : la distance en km entre deux points.</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Exemple — graphe à 5 nœuds</div>
+      <svg class="demo" viewBox="0 0 500 190" height="190">
+        <line x1="80" y1="100" x2="210" y2="50" stroke="rgba(34,211,238,.3)" stroke-width="2"/>
+        <line x1="80" y1="100" x2="210" y2="150" stroke="rgba(34,211,238,.3)" stroke-width="2"/>
+        <line x1="210" y1="50" x2="350" y2="50" stroke="rgba(34,211,238,.3)" stroke-width="2"/>
+        <line x1="210" y1="150" x2="350" y2="150" stroke="rgba(34,211,238,.3)" stroke-width="2"/>
+        <line x1="350" y1="50" x2="430" y2="100" stroke="rgba(34,211,238,.3)" stroke-width="2"/>
+        <line x1="350" y1="150" x2="430" y2="100" stroke="rgba(34,211,238,.3)" stroke-width="2"/>
+        <text x="135" y="62" fill="rgba(34,211,238,.7)" font-size="11" font-family="JetBrains Mono,monospace">3.2</text>
+        <text x="135" y="142" fill="rgba(34,211,238,.7)" font-size="11" font-family="JetBrains Mono,monospace">4.1</text>
+        <text x="270" y="38" fill="rgba(34,211,238,.7)" font-size="11" font-family="JetBrains Mono,monospace">5.8</text>
+        <text x="270" y="168" fill="rgba(34,211,238,.7)" font-size="11" font-family="JetBrains Mono,monospace">2.4</text>
+        <text x="385" y="68" fill="rgba(34,211,238,.7)" font-size="11" font-family="JetBrains Mono,monospace">3.0</text>
+        <text x="385" y="138" fill="rgba(34,211,238,.7)" font-size="11" font-family="JetBrains Mono,monospace">1.9</text>
+        <circle cx="80" cy="100" r="22" fill="rgba(34,211,238,.15)" stroke="#22d3ee" stroke-width="2"/>
+        <text x="80" y="96" text-anchor="middle" fill="#22d3ee" font-size="9" font-family="Sora,sans-serif" font-weight="700">DÉPÔT</text>
+        <text x="80" y="108" text-anchor="middle" fill="#22d3ee" font-size="10" font-family="JetBrains Mono,monospace">v₀</text>
+        <circle cx="210" cy="50" r="18" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="210" y="54" text-anchor="middle" fill="#a78bfa" font-size="12" font-family="JetBrains Mono,monospace" font-weight="700">v₁</text>
+        <circle cx="210" cy="150" r="18" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="210" y="154" text-anchor="middle" fill="#a78bfa" font-size="12" font-family="JetBrains Mono,monospace" font-weight="700">v₂</text>
+        <circle cx="350" cy="50" r="18" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="350" y="54" text-anchor="middle" fill="#a78bfa" font-size="12" font-family="JetBrains Mono,monospace" font-weight="700">v₃</text>
+        <circle cx="350" cy="150" r="18" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="350" y="154" text-anchor="middle" fill="#a78bfa" font-size="12" font-family="JetBrains Mono,monospace" font-weight="700">v₄</text>
+        <circle cx="430" cy="100" r="18" fill="rgba(74,222,128,.12)" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="430" y="104" text-anchor="middle" fill="#4ade80" font-size="12" font-family="JetBrains Mono,monospace" font-weight="700">v₅</text>
+        <text x="250" y="185" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="10" font-family="Sora,sans-serif">6 sommets · 6 arêtes pondérées · graphe non-orienté</text>
+      </svg>
+    </div>
+    <div class="callout info"><span class="callout-icon">ℹ️</span><span>Dans notre projet, le graphe est <strong>non-orienté</strong> (on peut circuler dans les deux sens sur chaque route) et <strong>connexe</strong> (tous les points sont accessibles depuis le dépôt).</span></div>
+  </div>
+  <hr class="divider">
+
+  <!-- 1.2 -->
+  <div class="step" id="l1s2">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div class="step-title-group"><h3>Modéliser la ville en Python</h3><p>Deux classes : PointCollecte et GrapheRoutier</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">point_collecte.py</span></div>
+      <pre><span class="kw">class</span> <span class="cls">PointCollecte</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, id_point, x, y, nom=<span class="str">""</span>):
+        self.id  = id_point   <span class="cm"># ex: 0 = dépôt, 1 = Quartier Nord</span>
+        self.x   = x          <span class="cm"># coordonnée X sur la carte</span>
+        self.y   = y          <span class="cm"># coordonnée Y sur la carte</span>
+        self.nom = nom        <span class="cm"># nom lisible (optionnel)</span>
+
+    <span class="kw">def</span> <span class="fn">distance_vers</span>(self, autre):
+        <span class="cm"># Formule : √((x2-x1)² + (y2-y1)²)</span>
+        <span class="kw">import</span> math
+        <span class="kw">return</span> math.sqrt((autre.x - self.x)**<span class="num">2</span> + (autre.y - self.y)**<span class="num">2</span>)</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">graphe_routier.py</span></div>
+      <pre><span class="kw">class</span> <span class="cls">GrapheRoutier</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.sommets    = {}  <span class="cm"># { id → PointCollecte }</span>
+        self.aretes     = {}  <span class="cm"># { (id1,id2) → distance }</span>
+        self._adjacence = {}  <span class="cm"># { id → [(voisin, distance)] }</span>
+
+    <span class="kw">def</span> <span class="fn">ajouter_arete</span>(self, id1, id2, distance=<span class="kw">None</span>):
+        <span class="kw">if</span> distance <span class="kw">is None</span>:
+            distance = self.sommets[id1].<span class="fn">distance_vers</span>(self.sommets[id2])
+        <span class="cm"># Non-orienté → stocker les 2 sens</span>
+        self._adjacence[id1].<span class="fn">append</span>((id2, distance))
+        self._adjacence[id2].<span class="fn">append</span>((id1, distance))</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 1.3 -->
+  <div class="step" id="l1s3">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div class="step-title-group"><h3>Distance euclidienne</h3><p>Le calcul de base qui donne le poids de chaque arête</p></div>
+    </div>
+    <div class="formula">d(A, B) = <span class="hi">√( (x<sub>B</sub>−x<sub>A</sub>)² + (y<sub>B</sub>−y<sub>A</sub>)² )</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Exemple — Dépôt (0,0) → Quartier Nord (2.5, 3.1)</div>
+      <svg class="demo" viewBox="0 0 460 190" height="185">
+        <defs><marker id="arr1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#22d3ee"/></marker></defs>
+        <line x1="60" y1="160" x2="400" y2="160" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+        <line x1="60" y1="160" x2="60" y2="20" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+        <line x1="60" y1="160" x2="260" y2="160" stroke="rgba(251,146,60,.5)" stroke-width="2" stroke-dasharray="5,3"/>
+        <line x1="260" y1="160" x2="260" y2="60" stroke="rgba(167,139,250,.5)" stroke-width="2" stroke-dasharray="5,3"/>
+        <line x1="60" y1="160" x2="258" y2="62" stroke="#22d3ee" stroke-width="2.5" marker-end="url(#arr1)"/>
+        <text x="160" y="178" text-anchor="middle" fill="rgba(251,146,60,.8)" font-size="11" font-family="JetBrains Mono,monospace">Δx = 2.5</text>
+        <text x="282" y="112" fill="rgba(167,139,250,.8)" font-size="11" font-family="JetBrains Mono,monospace">Δy = 3.1</text>
+        <text x="130" y="100" fill="#22d3ee" font-size="12" font-family="JetBrains Mono,monospace">d = √(2.5²+3.1²)</text>
+        <text x="130" y="118" fill="#22d3ee" font-size="12" font-family="JetBrains Mono,monospace">  = √(6.25+9.61)</text>
+        <text x="130" y="136" fill="#22d3ee" font-size="13" font-family="JetBrains Mono,monospace" font-weight="700">  ≈ 3.98 km ✓</text>
+        <circle cx="60" cy="160" r="9" fill="rgba(34,211,238,.2)" stroke="#22d3ee" stroke-width="2"/>
+        <text x="60" y="163" text-anchor="middle" fill="#22d3ee" font-size="8">D</text>
+        <text x="60" y="178" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="JetBrains Mono,monospace">(0,0)</text>
+        <circle cx="260" cy="60" r="9" fill="rgba(167,139,250,.2)" stroke="#a78bfa" stroke-width="2"/>
+        <text x="260" y="63" text-anchor="middle" fill="#a78bfa" font-size="8">N</text>
+        <text x="260" y="46" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="JetBrains Mono,monospace">(2.5, 3.1)</text>
+      </svg>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 1.4 DIJKSTRA -->
+  <div class="step" id="l1s4">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div class="step-title-group"><h3>Algorithme de Dijkstra — Pas à pas</h3><p>Clique sur Suivant pour voir chaque étape de l'exploration</p></div>
+    </div>
+    <div class="callout info"><span class="callout-icon">💡</span><span><strong>Idée clé :</strong> On maintient pour chaque nœud la meilleure distance connue depuis la source. À chaque étape, on explore le nœud non-visité le plus proche et on tente d'améliorer les distances de ses voisins.</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Simulation interactive — Dépôt(A) → Destination(E)</div>
+      <div class="stepper-controls">
+        <button class="step-btn" onclick="dijkPrev()" id="dijk-prev">← Précédent</button>
+        <button class="step-btn primary" onclick="dijkNext()" id="dijk-next">Suivant →</button>
+        <button class="step-btn" onclick="dijkReset()">↺ Recommencer</button>
+        <span class="step-indicator" id="dijk-ind">Étape 0 / 6</span>
+      </div>
+      <svg id="dijk-svg" class="demo" viewBox="0 0 560 200" height="210"></svg>
+      <div class="step-desc" id="dijk-desc">Appuyez sur <strong>Suivant</strong> pour démarrer. Graphe : A→B (3), A→C (4), B→C (2), B→D (5), C→E (7), D→E (2).</div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">graphe_routier.py — plus_court_chemin()</span></div>
+      <pre><span class="kw">import</span> heapq
+
+<span class="kw">def</span> <span class="fn">plus_court_chemin</span>(self, depart, arrivee):
+    distances     = {id: <span class="fn">float</span>(<span class="str">'inf'</span>) <span class="kw">for</span> id <span class="kw">in</span> self.sommets}
+    predecesseurs = {id: <span class="kw">None</span> <span class="kw">for</span> id <span class="kw">in</span> self.sommets}
+    distances[depart] = <span class="num">0</span>
+    file = [(<span class="num">0</span>, depart)]  <span class="cm"># (distance, sommet)</span>
+    visites = <span class="fn">set</span>()
+
+    <span class="kw">while</span> file:
+        dist_actuelle, sommet = heapq.<span class="fn">heappop</span>(file)  <span class="cm"># extraire le + proche</span>
+        <span class="kw">if</span> sommet <span class="kw">in</span> visites: <span class="kw">continue</span>
+        visites.<span class="fn">add</span>(sommet)
+
+        <span class="kw">for</span> voisin, poids <span class="kw">in</span> self._adjacence[sommet]:
+            nouvelle_dist = dist_actuelle + poids
+            <span class="kw">if</span> nouvelle_dist < distances[voisin]:   <span class="cm"># amélioration trouvée ?</span>
+                distances[voisin]     = nouvelle_dist
+                predecesseurs[voisin] = sommet
+                heapq.<span class="fn">heappush</span>(file, (nouvelle_dist, voisin))
+
+    <span class="cm"># Reconstruire le chemin en remontant les prédécesseurs</span>
+    chemin, cur = [], arrivee
+    <span class="kw">while</span> cur <span class="kw">is not None</span>:
+        chemin.<span class="fn">append</span>(cur)
+        cur = predecesseurs[cur]
+    <span class="kw">return</span> distances[arrivee], chemin[::<span class="num">-1</span>]</pre>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-q">❓ Pourquoi utilise-t-on un tas (heapq) plutôt qu'une liste simple ?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅐 Pour trier les nœuds par nom alphabétique</div>
+        <div class="quiz-opt" onclick="quiz(this,'correct')">🅑 Pour extraire le nœud de distance minimale en O(log V) au lieu de O(V)</div>
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅒 Pour éviter les doublons dans le graphe</div>
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅓 Pour stocker les arêtes plus efficacement</div>
+      </div>
+      <div class="quiz-feedback" id="qfb1">✅ <strong>Exact !</strong> La file de priorité min (tas binaire) permet d'extraire le minimum en O(log V). Sans ça, chercher le minimum dans une liste coûte O(V), ce qui porte la complexité totale à O(V²) au lieu de O((V+E)logV).</div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 1.5 MATRIX -->
+  <div class="step" id="l1s5">
+    <div class="step-header">
+      <div class="step-number">5</div>
+      <div class="step-title-group"><h3>Matrice des distances</h3><p>On lance Dijkstra depuis chaque sommet pour remplir toute la matrice</p></div>
+    </div>
+    <div class="callout tip"><span class="callout-icon">✅</span><span><strong>3 propriétés à vérifier :</strong> (1) Diagonale = 0, (2) Symétrie d(i,j)=d(j,i), (3) Inégalité triangulaire d(i,k) ≤ d(i,j)+d(j,k).</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Matrice 4×4 — 4 premiers points (code couleur par distance)</div>
+      <table class="nice-table">
+        <thead><tr><th>—</th><th>0 Dépôt</th><th>1 Q.Nord</th><th>2 Centre</th><th>3 Z.Ind.</th></tr></thead>
+        <tbody>
+          <tr><td><strong>0 Dépôt</strong></td><td style="color:var(--muted)">0.00</td><td style="color:#22d3ee">3.98</td><td style="color:#f59e0b">8.18</td><td style="color:#ef4444">8.32</td></tr>
+          <tr><td><strong>1 Q.Nord</strong></td><td style="color:#22d3ee">3.98</td><td style="color:var(--muted)">0.00</td><td style="color:#22d3ee">4.20</td><td style="color:#f59e0b">8.64</td></tr>
+          <tr><td><strong>2 Centre</strong></td><td style="color:#f59e0b">8.18</td><td style="color:#22d3ee">4.20</td><td style="color:var(--muted)">0.00</td><td style="color:#22d3ee">4.44</td></tr>
+          <tr><td><strong>3 Z.Ind.</strong></td><td style="color:#ef4444">8.32</td><td style="color:#f59e0b">8.64</td><td style="color:#22d3ee">4.44</td><td style="color:var(--muted)">0.00</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;display:flex;gap:14px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:#22d3ee;border-radius:2px;display:inline-block"></span>Court &lt;5km</span>
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:#f59e0b;border-radius:2px;display:inline-block"></span>Moyen 5-8km</span>
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:#ef4444;border-radius:2px;display:inline-block"></span>Long &gt;8km</span>
+      </div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">graphe_routier.py — matrice_distances()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">matrice_distances</span>(self):
+    ids = <span class="fn">sorted</span>(self.sommets.keys())
+    matrice = {}
+    <span class="kw">for</span> i <span class="kw">in</span> ids:
+        matrice[i] = {}
+        <span class="kw">for</span> j <span class="kw">in</span> ids:
+            <span class="kw">if</span> i == j:
+                matrice[i][j] = <span class="num">0.0</span>
+            <span class="kw">else</span>:
+                dist, _ = self.<span class="fn">plus_court_chemin</span>(i, j)  <span class="cm"># Dijkstra</span>
+                matrice[i][j] = dist
+    <span class="kw">return</span> matrice  <span class="cm"># Complexité totale : O(V × (V+E)logV)</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ N2 ══════════════════ -->
+<section class="level-section" style="--lc:var(--n2)">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(167,139,250,.07),transparent);border:1px solid rgba(167,139,250,.15)">
+    <div class="level-badge" style="background:rgba(167,139,250,.12);color:var(--n2)">
+      <span style="width:18px;height:18px;background:var(--n2);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">2</span>
+      NIVEAU 2 — AFFECTATION
+    </div>
+    <div class="level-title">Qui fait quoi ? Camion ↔ Zone</div>
+    <div class="level-desc">On a 3 camions et 6 zones à couvrir. On veut affecter chaque zone à un camion de façon optimale, en respectant les <strong>capacités</strong> et l'<strong>accessibilité</strong>. Le modèle est un <strong>graphe biparti</strong>.</div>
+    <div class="level-goal">🎯 <strong>Objectif :</strong> Affecter les 6 zones aux 3 camions sans dépasser les capacités, et équilibrer les charges (écart-type &lt; 20%).</div>
+  </div>
+
+  <!-- 2.1 -->
+  <div class="step" id="l2s1">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div class="step-title-group"><h3>Graphe biparti — Définition</h3><p>Deux groupes distincts : les arêtes ne connectent que des nœuds de groupes différents</p></div>
+    </div>
+    <div class="callout info"><span class="callout-icon">🔑</span><span>Un graphe G=(C∪Z, E) est <strong>biparti</strong> si ses sommets se divisent en 2 ensembles C et Z tels qu'aucune arête ne relie deux sommets du même ensemble. Ici C = camions, Z = zones.</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Graphe biparti complet — avant affectation</div>
+      <svg id="bip-svg" class="demo" viewBox="0 0 500 280" height="280"></svg>
+      <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:#3b82f6;border-radius:50%;display:inline-block"></span>Camions (C)</span>
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:#f59e0b;border-radius:50%;display:inline-block"></span>Zones (Z)</span>
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:18px;height:2px;background:rgba(255,255,255,.2);display:inline-block"></span>Possible</span>
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:18px;height:2px;background:#a78bfa;display:inline-block"></span>Sélectionnée</span>
+      </div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 2.2 -->
+  <div class="step" id="l2s2">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div class="step-title-group"><h3>Contrainte de capacité</h3><p>Chaque camion a une limite de poids à ne pas dépasser</p></div>
+    </div>
+    <div class="formula">Pour chaque camion c<sub>k</sub> : <span class="hi">∑ volume(z<sub>j</sub>) ≤ Capacité(c<sub>k</sub>)</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Simulateur capacité — Camion 1 (5000 kg max)</div>
+      <div id="cap-zones-list" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;min-height:36px"></div>
+      <div style="height:16px;background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;margin-bottom:6px">
+        <div id="cap-bar" style="height:100%;border-radius:8px;background:linear-gradient(90deg,var(--n2),var(--n4));width:0%;transition:width .6s ease"></div>
+      </div>
+      <div id="cap-label" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:12px">0 / 5000 kg (0%)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="step-btn" onclick="addCap(1,'Zone 4',2100,'#fb923c')">+ Zone 4 — 2100 kg</button>
+        <button class="step-btn" onclick="addCap(2,'Zone 2',1800,'#f472b6')">+ Zone 2 — 1800 kg</button>
+        <button class="step-btn" onclick="addCap(3,'Zone 1',1200,'#a78bfa')">+ Zone 1 — 1200 kg</button>
+        <button class="step-btn" onclick="addCap(4,'Zone 3',900,'#4ade80')">+ Zone 3 — 900 kg</button>
+        <button class="step-btn" onclick="resetCap()">↺ Vider</button>
+      </div>
+      <div id="cap-msg" style="margin-top:10px;font-size:12px;font-weight:600;display:none"></div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 2.3 -->
+  <div class="step" id="l2s3">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div class="step-title-group"><h3>Algorithme Glouton — Étape par étape</h3><p>Meilleure décision locale à chaque instant</p></div>
+    </div>
+    <div class="callout warn"><span class="callout-icon">⚠️</span><span>Le glouton <strong>ne garantit pas l'optimum global</strong>. Mais il est rapide O(n log n) et donne de bonnes solutions en pratique. Pour l'optimum exact, il faudrait la programmation linéaire entière (beaucoup plus lent).</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Simulation glouton — cliquer pour avancer</div>
+      <div class="stepper-controls">
+        <button class="step-btn primary" onclick="greedyNext()" id="greedy-btn">Étape suivante →</button>
+        <button class="step-btn" onclick="greedyReset()">↺ Recommencer</button>
+        <span class="step-indicator" id="greedy-ind">0 / 6</span>
+      </div>
+      <svg id="greedy-svg" class="demo" viewBox="0 0 500 240" height="240"></svg>
+      <div class="step-desc" id="greedy-desc">Zones triées par volume décroissant : Zone4(2100) → Zone2(1800) → Zone5(1500) → Zone1(1200) → Zone3(900). On va affecter une par une.</div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">affectateur_biparti.py — affectation_gloutonne()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">affectation_gloutonne</span>(self):
+    <span class="cm"># ÉTAPE 1 : trier les zones par volume décroissant</span>
+    zones_triees = <span class="fn">sorted</span>(self.zones.values(),
+                           key=<span class="kw">lambda</span> z: z.volume_moyen, reverse=<span class="kw">True</span>)
+    affectation = {cid: [] <span class="kw">for</span> cid <span class="kw">in</span> self.camions}
+
+    <span class="kw">for</span> zone <span class="kw">in</span> zones_triees:
+        meilleur_camion, meilleur_cout = <span class="kw">None</span>, <span class="fn">float</span>(<span class="str">'inf'</span>)
+
+        <span class="cm"># ÉTAPE 2 : trouver le camion le moins chargé accessible</span>
+        <span class="kw">for</span> camion <span class="kw">in</span> self.camions.values():
+            <span class="kw">if not</span> camion.<span class="fn">peut_servir_zone</span>(zone.id): <span class="kw">continue</span>
+            nouvelle_charge = camion.charge_actuelle + zone.volume_moyen
+            <span class="kw">if</span> nouvelle_charge > camion.capacite: <span class="kw">continue</span>  <span class="cm"># trop lourd</span>
+            cout = camion.charge_actuelle  <span class="cm"># critère : charge actuelle</span>
+            <span class="kw">if</span> cout < meilleur_cout:
+                meilleur_cout, meilleur_camion = cout, camion
+
+        <span class="cm"># ÉTAPE 3 : affecter et mettre à jour la charge</span>
+        <span class="kw">if</span> meilleur_camion:
+            affectation[meilleur_camion.id].<span class="fn">append</span>(zone.id)
+            meilleur_camion.charge_actuelle += zone.volume_moyen
+    <span class="kw">return</span> affectation</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 2.4 -->
+  <div class="step" id="l2s4">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div class="step-title-group"><h3>Équilibrage des charges</h3><p>Après l'affectation initiale, on déplace des zones pour réduire l'écart-type</p></div>
+    </div>
+    <div class="formula">Minimiser : <span class="hi">σ = √( ∑(charge(cₖ) − μ)² / n )</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Avant / Après rééquilibrage</div>
+      <svg class="demo" viewBox="0 0 500 155" height="155">
+        <text x="125" y="16" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">AVANT</text>
+        <rect x="40" y="22" width="50" height="110" rx="5" fill="rgba(59,130,246,.08)" stroke="rgba(59,130,246,.3)" stroke-width="1"/>
+        <rect x="40" y="22" width="50" height="88" rx="5" fill="rgba(59,130,246,.4)"/>
+        <text x="65" y="118" text-anchor="middle" fill="#3b82f6" font-size="9" font-family="JetBrains Mono,monospace">4100kg</text>
+        <rect x="105" y="22" width="50" height="110" rx="5" fill="rgba(245,158,11,.08)" stroke="rgba(245,158,11,.3)" stroke-width="1"/>
+        <rect x="105" y="22" width="50" height="27" rx="5" fill="rgba(245,158,11,.4)"/>
+        <text x="130" y="118" text-anchor="middle" fill="#f59e0b" font-size="9" font-family="JetBrains Mono,monospace">1200kg</text>
+        <rect x="170" y="22" width="50" height="110" rx="5" fill="rgba(0,212,170,.08)" stroke="rgba(0,212,170,.3)" stroke-width="1"/>
+        <rect x="170" y="22" width="50" height="55" rx="5" fill="rgba(0,212,170,.4)"/>
+        <text x="195" y="118" text-anchor="middle" fill="#00d4aa" font-size="9" font-family="JetBrains Mono,monospace">2300kg</text>
+        <text x="125" y="144" text-anchor="middle" fill="#ef4444" font-size="10" font-family="JetBrains Mono,monospace">σ = 1205 kg ❌</text>
+        <text x="258" y="82" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="24">→</text>
+        <text x="385" y="16" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">APRÈS</text>
+        <rect x="300" y="22" width="50" height="110" rx="5" fill="rgba(59,130,246,.08)" stroke="rgba(59,130,246,.3)" stroke-width="1"/>
+        <rect x="300" y="32" width="50" height="100" rx="5" fill="rgba(59,130,246,.4)"/>
+        <text x="325" y="118" text-anchor="middle" fill="#3b82f6" font-size="9" font-family="JetBrains Mono,monospace">2567kg</text>
+        <rect x="365" y="22" width="50" height="110" rx="5" fill="rgba(245,158,11,.08)" stroke="rgba(245,158,11,.3)" stroke-width="1"/>
+        <rect x="365" y="34" width="50" height="98" rx="5" fill="rgba(245,158,11,.4)"/>
+        <text x="390" y="118" text-anchor="middle" fill="#f59e0b" font-size="9" font-family="JetBrains Mono,monospace">2433kg</text>
+        <rect x="430" y="22" width="50" height="110" rx="5" fill="rgba(0,212,170,.08)" stroke="rgba(0,212,170,.3)" stroke-width="1"/>
+        <rect x="430" y="33" width="50" height="99" rx="5" fill="rgba(0,212,170,.4)"/>
+        <text x="455" y="118" text-anchor="middle" fill="#00d4aa" font-size="9" font-family="JetBrains Mono,monospace">2600kg</text>
+        <text x="385" y="144" text-anchor="middle" fill="#4ade80" font-size="10" font-family="JetBrains Mono,monospace">σ = 69 kg ✓</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ N3 ══════════════════ -->
+<section class="level-section" style="--lc:var(--n3)">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(251,146,60,.07),transparent);border:1px solid rgba(251,146,60,.15)">
+    <div class="level-badge" style="background:rgba(251,146,60,.12);color:var(--n3)">
+      <span style="width:18px;height:18px;background:var(--n3);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">3</span>
+      NIVEAU 3 — CRÉNEAUX TEMPORELS
+    </div>
+    <div class="level-title">Quand collecter ? Camion ↔ Zone ↔ Créneau</div>
+    <div class="level-desc">On ajoute la dimension <strong>temps</strong>. Chaque zone n'est accessible qu'à certaines heures. Un camion ne peut pas être à deux endroits simultanément. Le modèle devient un <strong>graphe triparti</strong>.</div>
+    <div class="level-goal">🎯 <strong>Objectif :</strong> Générer un planning hebdomadaire sans conflits horaires, 0 chevauchement.</div>
+  </div>
+
+  <!-- 3.1 -->
+  <div class="step" id="l3s1">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div class="step-title-group"><h3>Graphe triparti — 3 ensembles de nœuds</h3><p>On étend le graphe biparti avec un troisième ensemble : les créneaux</p></div>
+    </div>
+    <div class="explain-row">
+      <div class="explain-card"><h4>C — Camions</h4><p>3 camions. Chacun a des zones accessibles et des pauses obligatoires (ex: déjeuner 12h-13h).</p></div>
+      <div class="explain-card"><h4>Z — Zones</h4><p>6 zones avec une fenêtre horaire d'accessibilité : ex. zone résidentielle interdite la nuit.</p></div>
+      <div class="explain-card"><h4>T — Créneaux</h4><p>9 créneaux de 2h sur 5 jours. Chaque créneau a un coefficient de congestion (1.0 à 2.0).</p></div>
+    </div>
+    <div class="callout info"><span class="callout-icon">🔑</span><span>Un triplet <strong>(c<sub>i</sub>, z<sub>j</sub>, t<sub>k</sub>)</strong> est <strong>réalisable</strong> si ET seulement si : (1) c<sub>i</sub> accède à z<sub>j</sub>, (2) z<sub>j</sub> ouverte pendant t<sub>k</sub>, (3) c<sub>i</sub> pas en pause pendant t<sub>k</sub>.</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Structure du graphe triparti</div>
+      <svg id="trip-svg" class="demo" viewBox="0 0 500 300" height="300"></svg>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 3.2 -->
+  <div class="step" id="l3s2">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div class="step-title-group"><h3>Fenêtres horaires</h3><p>Chaque zone a une plage d'accessibilité — en dehors, la collecte est interdite</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Vérification fenêtre horaire — 3 zones</div>
+      <svg class="demo" viewBox="0 0 500 200" height="200">
+        <text x="250" y="16" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="10" font-family="JetBrains Mono,monospace">00h    06h    12h    18h    24h</text>
+        <line x1="30" y1="20" x2="470" y2="20" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+        <!-- Zone 1: 06-18 -->
+        <text x="30" y="48" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">Zone résid.</text>
+        <rect x="140" y="38" width="220" height="20" rx="4" fill="rgba(74,222,128,.2)" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="250" y="52" text-anchor="middle" fill="#4ade80" font-size="10" font-family="Sora,sans-serif">06:00 → 18:00 ✓</text>
+        <rect x="30" y="38" width="110" height="20" rx="4" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.3)" stroke-width="1"/>
+        <rect x="360" y="38" width="110" height="20" rx="4" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.3)" stroke-width="1"/>
+        <!-- Zone 2: toute la journée -->
+        <text x="30" y="90" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">Zone indus.</text>
+        <rect x="30" y="80" width="440" height="20" rx="4" fill="rgba(34,211,238,.15)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="250" y="94" text-anchor="middle" fill="#22d3ee" font-size="10" font-family="Sora,sans-serif">00:00 → 24:00 — Toujours accessible ✓</text>
+        <!-- Zone 3: 08-14 only -->
+        <text x="30" y="132" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">Zone comm.</text>
+        <rect x="168" y="122" width="110" height="20" rx="4" fill="rgba(251,146,60,.2)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="223" y="136" text-anchor="middle" fill="#fb923c" font-size="10" font-family="Sora,sans-serif">08:00 → 14:00</text>
+        <rect x="30" y="122" width="138" height="20" rx="4" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.25)" stroke-width="1"/>
+        <rect x="278" y="122" width="192" height="20" rx="4" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.25)" stroke-width="1"/>
+        <!-- Créneau exemple -->
+        <line x1="195" y1="160" x2="195" y2="195" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="250" y1="160" x2="250" y2="195" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="192" y="162" width="62" height="22" rx="5" fill="rgba(74,222,128,.2)" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="223" y="177" text-anchor="middle" fill="#4ade80" font-size="9" font-family="Sora,sans-serif">10h-12h ✓</text>
+        <line x1="380" y1="160" x2="380" y2="195" stroke="rgba(239,68,68,.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="435" y1="160" x2="435" y2="195" stroke="rgba(239,68,68,.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="377" y="162" width="62" height="22" rx="5" fill="rgba(239,68,68,.12)" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="408" y="177" text-anchor="middle" fill="#ef4444" font-size="9" font-family="Sora,sans-serif">18h-20h ✗</text>
+      </svg>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">planificateur_triparti.py — est_realisable()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">est_realisable</span>(self, camion_id, zone_id, creneau):
+    <span class="cm"># 1. Vérifier la fenêtre horaire de la zone</span>
+    <span class="kw">if</span> zone_id <span class="kw">in</span> self.fenetres_zone:
+        debut_ok, fin_ok = self.fenetres_zone[zone_id]
+        <span class="kw">if</span> creneau.debut < debut_ok <span class="kw">or</span> creneau.fin > fin_ok:
+            <span class="kw">return False</span>  <span class="cm"># hors fenêtre → refusé</span>
+
+    <span class="cm"># 2. Vérifier les pauses du camion</span>
+    <span class="kw">for</span> p_debut, p_fin <span class="kw">in</span> self.pauses_camion.get(camion_id, []):
+        <span class="cm"># Chevauchement : debut1 &lt; fin2 ET debut2 &lt; fin1</span>
+        <span class="kw">if</span> creneau.debut < p_fin <span class="kw">and</span> p_debut < creneau.fin:
+            <span class="kw">return False</span>  <span class="cm"># conflit avec pause → refusé</span>
+
+    <span class="kw">return True</span>  <span class="cm"># toutes les contraintes OK</span></pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 3.3 -->
+  <div class="step" id="l3s3">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div class="step-title-group"><h3>Détection de chevauchement</h3><p>Un camion ne peut pas avoir deux zones en même temps</p></div>
+    </div>
+    <div class="formula">Chevauchement si : <span class="hi">debut₁ &lt; fin₂</span> ET <span class="hi">debut₂ &lt; fin₁</span></div>
+    <div class="viz-box">
+      <div class="viz-title">3 cas possibles</div>
+      <svg class="demo" viewBox="0 0 500 140" height="140">
+        <text x="80" y="18" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">Séparés</text>
+        <rect x="20" y="26" width="70" height="18" rx="4" fill="rgba(74,222,128,.3)" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="55" y="39" text-anchor="middle" fill="#4ade80" font-size="9" font-family="JetBrains Mono,monospace">06h-08h</text>
+        <rect x="100" y="48" width="70" height="18" rx="4" fill="rgba(74,222,128,.3)" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="135" y="61" text-anchor="middle" fill="#4ade80" font-size="9" font-family="JetBrains Mono,monospace">10h-12h</text>
+        <text x="87" y="88" text-anchor="middle" fill="#4ade80" font-size="10" font-family="Sora,sans-serif">✓ OK</text>
+        <text x="87" y="102" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="9" font-family="JetBrains Mono,monospace">fin₁≤debut₂</text>
+
+        <text x="255" y="18" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">Chevauchement</text>
+        <rect x="190" y="26" width="80" height="18" rx="4" fill="rgba(239,68,68,.3)" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="230" y="39" text-anchor="middle" fill="#ef4444" font-size="9" font-family="JetBrains Mono,monospace">08h-10h</text>
+        <rect x="240" y="48" width="80" height="18" rx="4" fill="rgba(239,68,68,.3)" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="280" y="61" text-anchor="middle" fill="#ef4444" font-size="9" font-family="JetBrains Mono,monospace">09h-11h</text>
+        <rect x="240" y="26" width="30" height="40" rx="3" fill="rgba(239,68,68,.15)" stroke="rgba(239,68,68,.4)" stroke-width="1" stroke-dasharray="2,2"/>
+        <text x="255" y="88" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Sora,sans-serif">✗ Conflit</text>
+        <text x="255" y="102" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="9" font-family="JetBrains Mono,monospace">debut₁&lt;fin₂ ET debut₂&lt;fin₁</text>
+
+        <text x="435" y="18" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">Contenu</text>
+        <rect x="385" y="26" width="100" height="18" rx="4" fill="rgba(239,68,68,.3)" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="435" y="39" text-anchor="middle" fill="#ef4444" font-size="9" font-family="JetBrains Mono,monospace">08h-12h</text>
+        <rect x="405" y="48" width="60" height="18" rx="4" fill="rgba(239,68,68,.3)" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="435" y="61" text-anchor="middle" fill="#ef4444" font-size="9" font-family="JetBrains Mono,monospace">09h-11h</text>
+        <text x="435" y="88" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Sora,sans-serif">✗ Conflit</text>
+        <text x="435" y="102" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="9" font-family="JetBrains Mono,monospace">même règle</text>
+
+        <rect x="10" y="115" width="480" height="22" rx="6" fill="rgba(255,255,255,.03)" stroke="var(--border)" stroke-width="1"/>
+        <text x="250" y="130" text-anchor="middle" fill="#fb923c" font-size="11" font-family="JetBrains Mono,monospace">def chevauche(c1,c2): return c1.debut &lt; c2.fin and c2.debut &lt; c1.fin</text>
+      </svg>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 3.4 -->
+  <div class="step" id="l3s4">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div class="step-title-group"><h3>Planning hebdomadaire — Résultat</h3><p>Le planificateur génère la semaine complète sans conflits</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Planning Lundi — 3 camions, 6 zones, 0 conflit</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:8px;align-items:center">
+          <span style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">06:00–08:00</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <div style="padding:5px 10px;border-radius:6px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);font-size:11px;color:#3b82f6;font-weight:600">🚛 C1 → Zone 4 · 2100kg · ×1.0</div>
+            <div style="padding:5px 10px;border-radius:6px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);font-size:11px;color:#f59e0b;font-weight:600">🚚 C2 → Zone 5 · 1500kg · ×1.0</div>
+            <div style="padding:5px 10px;border-radius:6px;background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.3);font-size:11px;color:#00d4aa;font-weight:600">🚐 C3 → Zone 6 · 1100kg · ×1.0</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:8px;align-items:center">
+          <span style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">08:00–10:00</span>
+          <div style="padding:5px 10px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:11px;color:var(--muted)">Déplacements inter-zones</div>
+        </div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:8px;align-items:center">
+          <span style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">10:00–12:00</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <div style="padding:5px 10px;border-radius:6px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);font-size:11px;color:#3b82f6;font-weight:600">🚛 C1 → Zone 3 · 900kg · ×1.1</div>
+            <div style="padding:5px 10px;border-radius:6px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);font-size:11px;color:#f59e0b;font-weight:600">🚚 C2 → Zone 1 · 1200kg · ×1.1</div>
+            <div style="padding:5px 10px;border-radius:6px;background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.3);font-size:11px;color:#00d4aa;font-weight:600">🚐 C3 → Zone 2 · 1800kg · ×1.1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ N4 ══════════════════ -->
+<section class="level-section" style="--lc:var(--n4)">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(74,222,128,.07),transparent);border:1px solid rgba(74,222,128,.15)">
+    <div class="level-badge" style="background:rgba(74,222,128,.12);color:var(--n4)">
+      <span style="width:18px;height:18px;background:var(--n4);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">4</span>
+      NIVEAU 4 — VRP
+    </div>
+    <div class="level-title">Quel trajet exact ? Vehicle Routing Problem</div>
+    <div class="level-desc">On génère les <strong>itinéraires concrets</strong> de chaque camion dans quel ordre visiter les points. C'est un problème NP-difficile : on utilise des <strong>heuristiques</strong> en 3 phases.</div>
+    <div class="level-goal">🎯 <strong>Objectif :</strong> Réduire la distance de 50.63 km à 38.39 km (−24.2%) via construction + 2-opt + Tabou.</div>
+  </div>
+
+  <!-- 4.1 -->
+  <div class="step" id="l4s1">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div class="step-title-group"><h3>Problème VRP — Formulation mathématique</h3><p>NP-difficile : pas de solution exacte en temps polynomial pour de grandes instances</p></div>
+    </div>
+    <div class="formula">Minimiser : <span class="hi">∑<sub>k</sub> ∑<sub>(i,j)</sub> d<sub>ij</sub> · x<sub>ijk</sub></span><br><small style="color:var(--muted);font-size:11px">x<sub>ijk</sub>=1 si camion k va de i vers j · Contrainte capacité · Contrainte unicité</small></div>
+    <div class="explain-row">
+      <div class="explain-card"><h4>Phase 1 — Construction</h4><p>Plus proche voisin : greedy O(n²). Rapide, solution de base raisonnable.</p></div>
+      <div class="explain-card"><h4>Phase 2 — 2-opt</h4><p>Amélioration locale : inverse des segments pour supprimer les croisements.</p></div>
+      <div class="explain-card"><h4>Phase 3 — Tabou</h4><p>Métaheuristique globale : explore hors du minimum local via liste tabou.</p></div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 4.2 -->
+  <div class="step" id="l4s2">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div class="step-title-group"><h3>Plus Proche Voisin — Construction</h3><p>Depuis le dépôt, on visite toujours le point non-visité le plus proche</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Simulation interactive — cliquer Suivant</div>
+      <div class="stepper-controls">
+        <button class="step-btn primary" onclick="nnNext()" id="nn-btn">Suivant →</button>
+        <button class="step-btn" onclick="nnReset()">↺ Recommencer</button>
+        <span class="step-indicator" id="nn-ind">Étape 0 / 9</span>
+      </div>
+      <svg id="nn-svg" class="demo" viewBox="-0.5 -0.5 11 10" height="280"></svg>
+      <div class="step-desc" id="nn-desc">On part du dépôt (point 0). À chaque étape, on va au point le plus proche non encore visité.</div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">optimiseur_vrp.py — construire_solution_initiale()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">construire_solution_initiale</span>(self):
+    non_visites = <span class="fn">set</span>(<span class="fn">range</span>(<span class="num">1</span>, <span class="fn">len</span>(self.points)))  <span class="cm"># sans le dépôt (0)</span>
+    tournee = [<span class="num">0</span>]  <span class="cm"># commencer au dépôt</span>
+    position = <span class="num">0</span>
+
+    <span class="kw">while</span> non_visites:
+        <span class="cm"># Chercher le voisin le plus proche non-visité</span>
+        plus_proche = <span class="fn">min</span>(non_visites,
+            key=<span class="kw">lambda</span> p: self.matrice[position][p])
+
+        <span class="cm"># Vérifier la capacité avant d'ajouter</span>
+        charge_future = <span class="fn">sum</span>(self.demandes[p] <span class="kw">for</span> p <span class="kw">in</span> tournee[<span class="num">1</span>:]) + self.demandes[plus_proche]
+        <span class="kw">if</span> charge_future > self.capacite_camion:
+            <span class="kw">break</span>  <span class="cm"># camion plein → passer au suivant</span>
+
+        tournee.<span class="fn">append</span>(plus_proche)
+        non_visites.<span class="fn">discard</span>(plus_proche)
+        position = plus_proche
+
+    tournee.<span class="fn">append</span>(<span class="num">0</span>)  <span class="cm"># retour au dépôt</span>
+    <span class="kw">return</span> tournee</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 4.3 -->
+  <div class="step" id="l4s3">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div class="step-title-group"><h3>Algorithme 2-opt — Amélioration locale</h3><p>Inverse des segments pour éliminer les croisements dans la tournée</p></div>
+    </div>
+    <div class="callout tip"><span class="callout-icon">✅</span><span><strong>Intuition :</strong> Si deux arêtes de la tournée se croisent, les supprimer et reconnecter autrement réduit toujours la distance. Le 2-opt élimine tous les croisements.</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Démonstration 2-opt — Avant / Après</div>
+      <div class="stepper-controls">
+        <button class="step-btn primary" onclick="twoOptShow()" id="twoopt-btn">Montrer 2-opt</button>
+        <button class="step-btn" onclick="twoOptReset()">↺ Avant</button>
+      </div>
+      <svg id="twoopt-svg" class="demo" viewBox="0 0 500 200" height="200"></svg>
+      <div class="step-desc" id="twoopt-desc">Tournée initiale avec un croisement. Cliquer pour voir l'amélioration 2-opt.</div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">optimiseur_vrp.py — algorithme_2opt()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">algorithme_2opt</span>(self, tournee):
+    ameliore = <span class="kw">True</span>
+    <span class="kw">while</span> ameliore:          <span class="cm"># continuer tant qu'il y a des améliorations</span>
+        ameliore = <span class="kw">False</span>
+        n = <span class="fn">len</span>(tournee)
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, n - <span class="num">2</span>):
+            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(i + <span class="num">1</span>, n - <span class="num">1</span>):
+                <span class="cm"># Tester : vaut-il mieux inverser le segment [i..j] ?</span>
+                d_avant = self.matrice[tournee[i-<span class="num">1</span>]][tournee[i]] \
+                        + self.matrice[tournee[j]][tournee[j+<span class="num">1</span>]]
+                d_apres = self.matrice[tournee[i-<span class="num">1</span>]][tournee[j]] \
+                        + self.matrice[tournee[i]][tournee[j+<span class="num">1</span>]]
+                <span class="kw">if</span> d_apres < d_avant - <span class="num">1e-10</span>:  <span class="cm"># amélioration trouvée</span>
+                    <span class="cm"># Inverser le segment</span>
+                    tournee[i:j+<span class="num">1</span>] = tournee[i:j+<span class="num">1</span>][::<span class="num">-1</span>]
+                    ameliore = <span class="kw">True</span>
+    <span class="kw">return</span> tournee</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 4.4 -->
+  <div class="step" id="l4s4">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div class="step-title-group"><h3>Recherche Tabou — Optimisation globale</h3><p>Accepte des solutions légèrement moins bonnes pour échapper aux minima locaux</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Paysage de solutions — Pourquoi la Tabou ?</div>
+      <svg class="demo" viewBox="0 0 500 170" height="170">
+        <defs><linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4ade80" stop-opacity=".2"/><stop offset="100%" stop-color="#4ade80" stop-opacity="0"/></linearGradient></defs>
+        <path d="M20,140 Q60,90 100,108 Q130,120 160,76 Q190,48 220,68 Q250,88 280,58 Q312,36 342,82 Q370,118 400,92 Q430,72 470,88 L470,155 L20,155 Z" fill="url(#gl)" stroke="rgba(74,222,128,.4)" stroke-width="2"/>
+        <circle cx="100" cy="110" r="5" fill="#fb923c"/>
+        <text x="100" y="102" text-anchor="middle" fill="#fb923c" font-size="9" font-family="Sora,sans-serif">Min local</text>
+        <text x="100" y="91" text-anchor="middle" fill="rgba(251,146,60,.6)" font-size="8" font-family="Sora,sans-serif">2-opt bloqué ici</text>
+        <circle cx="312" cy="38" r="6" fill="#4ade80"/>
+        <text x="312" y="30" text-anchor="middle" fill="#4ade80" font-size="9" font-family="Sora,sans-serif">Min global ← objectif</text>
+        <path d="M100,110 Q150,138 200,98 Q248,72 282,60" fill="none" stroke="#f472b6" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="195" y="128" fill="#f472b6" font-size="9" font-family="Sora,sans-serif">Tabou accepte pire pour avancer →</text>
+        <text x="245" y="163" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="Sora,sans-serif">← Espace des solutions →</text>
+        <text x="12" y="98" fill="rgba(255,255,255,.2)" font-size="8" font-family="Sora,sans-serif" transform="rotate(-90,12,98)">Distance</text>
+      </svg>
+    </div>
+    <div class="explain-row">
+      <div class="explain-card"><h4>Liste Tabou</h4><p>Mémorise les 10 derniers mouvements. On ne peut pas les refaire — évite les cycles.</p></div>
+      <div class="explain-card"><h4>Mouvement</h4><p>Échanger un point entre deux tournées. On teste plusieurs candidats par itération.</p></div>
+      <div class="explain-card"><h4>Arrêt</h4><p>100 itérations max, ou 15 itérations sans amélioration (stagnation détectée).</p></div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-q">❓ Pourquoi la Recherche Tabou est-elle meilleure que le 2-opt seul ?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅐 Parce qu'elle est toujours plus rapide</div>
+        <div class="quiz-opt" onclick="quiz(this,'correct')">🅑 Parce qu'elle peut accepter des solutions pires temporairement pour sortir des minima locaux</div>
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅒 Parce qu'elle garantit l'optimum global</div>
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅓 Parce qu'elle utilise moins de mémoire</div>
+      </div>
+      <div class="quiz-feedback" id="qfb2">✅ <strong>Exact !</strong> Le 2-opt s'arrête dès qu'il n'y a plus d'amélioration locale. La Tabou peut "remonter" la colline pour explorer de nouveaux voisinages et atteindre de meilleures solutions globales. Résultat : −24.2% de distance sur notre instance.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ N5 ══════════════════ -->
+<section class="level-section" style="--lc:var(--n5)">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(244,114,182,.07),transparent);border:1px solid rgba(244,114,182,.15)">
+    <div class="level-badge" style="background:rgba(244,114,182,.12);color:var(--n5)">
+      <span style="width:18px;height:18px;background:var(--n5);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">5</span>
+      NIVEAU 5 — SYSTÈME DYNAMIQUE
+    </div>
+    <div class="level-title">Temps réel, IoT & Multi-objectif</div>
+    <div class="level-desc">Le niveau le plus avancé : capteurs IoT simulant le remplissage en continu, gestion d'incidents (pannes, trafic), et optimisation <strong>simultanée de 4 objectifs contradictoires</strong> via le front de Pareto.</div>
+    <div class="level-goal">🎯 <strong>Objectif :</strong> Détecter urgences (niveau&gt;90%), replanifier en &lt;2s, trouver le meilleur compromis coût/CO2/satisfaction/équité.</div>
+  </div>
+
+  <!-- 5.1 -->
+  <div class="step" id="l5s1">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div class="step-title-group"><h3>Capteurs IoT — Modèle de remplissage</h3><p>Simulation du remplissage des conteneurs avec bruit gaussien réaliste</p></div>
+    </div>
+    <div class="formula">niveau(t+Δt) = niveau(t) + <span class="hi">taux_horaire × Δt</span> + gauss(μ=0, σ=0.5)</div>
+    <div class="viz-box">
+      <div class="viz-title">Simulation capteur — cliquer pour avancer le temps</div>
+      <div class="stepper-controls">
+        <button class="step-btn primary" onclick="sensorTick()">+ 1h</button>
+        <button class="step-btn" onclick="sensorReset()">↺ Reset (06:00)</button>
+        <span class="step-indicator" id="sensor-time">06:00</span>
+      </div>
+      <svg id="sensor-svg" class="demo" viewBox="0 0 500 200" height="200"></svg>
+      <div class="step-desc" id="sensor-desc">5 capteurs IoT. Chacun a un taux de remplissage différent (2–8%/h). Alerte &gt;80%, Urgence &gt;90%.</div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">systeme_dynamique.py — CapteurIoT</span></div>
+      <pre><span class="kw">class</span> <span class="cls">CapteurIoT</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, point_id, niveau_initial=<span class="num">0.0</span>):
+        self.niveau        = niveau_initial
+        self.seuil_alerte  = <span class="num">80.0</span>   <span class="cm"># % → notifier opérateur</span>
+        self.seuil_urgence = <span class="num">90.0</span>   <span class="cm"># % → replanification immédiate</span>
+        self._taux_h       = random.<span class="fn">uniform</span>(<span class="num">2</span>, <span class="num">8</span>)  <span class="cm"># %/heure</span>
+        self.historique    = []
+
+    <span class="kw">def</span> <span class="fn">simuler_remplissage</span>(self, heures):
+        bruit = random.<span class="fn">gauss</span>(<span class="num">0</span>, <span class="num">0.5</span>)  <span class="cm"># bruit réaliste</span>
+        self.niveau = <span class="fn">min</span>(<span class="num">100.0</span>, self.niveau + self._taux_h * heures + bruit)
+        self.historique.<span class="fn">append</span>((heures, self.niveau))
+
+    <span class="kw">def</span> <span class="fn">detecter_urgence</span>(self):
+        <span class="kw">return</span> self.niveau >= self.seuil_urgence  <span class="cm"># True → replanifier !</span></pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 5.2 -->
+  <div class="step" id="l5s2">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div class="step-title-group"><h3>Simulation temps réel — Boucle principale</h3><p>Le système avance par pas de 30 min et réagit aux événements</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Flux d'exécution de la simulation</div>
+      <svg class="demo" viewBox="0 0 500 230" height="230">
+        <rect x="185" y="8" width="130" height="34" rx="8" fill="rgba(244,114,182,.15)" stroke="#f472b6" stroke-width="1.5"/>
+        <text x="250" y="29" text-anchor="middle" fill="#f472b6" font-size="11" font-family="Sora,sans-serif" font-weight="600">Avancer +30 min</text>
+        <rect x="55" y="66" width="125" height="34" rx="8" fill="rgba(59,130,246,.1)" stroke="#3b82f6" stroke-width="1"/>
+        <text x="118" y="87" text-anchor="middle" fill="#3b82f6" font-size="10" font-family="Sora,sans-serif">IoT remplissage</text>
+        <rect x="320" y="66" width="125" height="34" rx="8" fill="rgba(251,146,60,.1)" stroke="#fb923c" stroke-width="1"/>
+        <text x="382" y="82" text-anchor="middle" fill="#fb923c" font-size="10" font-family="Sora,sans-serif">Événements aléatoires</text>
+        <text x="382" y="95" text-anchor="middle" fill="rgba(251,146,60,.5)" font-size="9" font-family="Sora,sans-serif">panne 5%, trafic 15%</text>
+        <rect x="185" y="124" width="130" height="34" rx="8" fill="rgba(239,68,68,.1)" stroke="#ef4444" stroke-width="1"/>
+        <text x="250" y="140" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Sora,sans-serif">Urgence ? niveau&gt;90%</text>
+        <rect x="70" y="184" width="140" height="34" rx="8" fill="rgba(74,222,128,.1)" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="140" y="200" text-anchor="middle" fill="#4ade80" font-size="10" font-family="Sora,sans-serif" font-weight="600">Replanification urgente</text>
+        <text x="140" y="212" text-anchor="middle" fill="rgba(74,222,128,.5)" font-size="9" font-family="Sora,sans-serif">insérer en tête · &lt;2s</text>
+        <rect x="295" y="184" width="135" height="34" rx="8" fill="rgba(100,116,139,.1)" stroke="rgba(100,116,139,.4)" stroke-width="1"/>
+        <text x="362" y="205" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Sora,sans-serif">Continuer normalement</text>
+        <!-- Arrows -->
+        <line x1="250" y1="42" x2="118" y2="66" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+        <line x1="250" y1="42" x2="382" y2="66" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+        <line x1="118" y1="100" x2="210" y2="124" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+        <line x1="382" y1="100" x2="300" y2="124" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+        <line x1="210" y1="158" x2="140" y2="184" stroke="#ef4444" stroke-width="1.5"/>
+        <line x1="290" y1="158" x2="362" y2="184" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
+        <text x="166" y="176" fill="#ef4444" font-size="9" font-family="Sora,sans-serif">Oui</text>
+        <text x="316" y="176" fill="rgba(255,255,255,.3)" font-size="9" font-family="Sora,sans-serif">Non</text>
+        <path d="M455,83 Q485,83 485,25 Q485,8 315,8" fill="none" stroke="rgba(244,114,182,.3)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="486" y="52" fill="rgba(244,114,182,.35)" font-size="9" font-family="Sora,sans-serif">↺</text>
+      </svg>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 5.3 PARETO INTERACTIVE -->
+  <div class="step" id="l5s3">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div class="step-title-group"><h3>Multi-objectif — Front de Pareto</h3><p>4 objectifs contradictoires : ajouter des solutions pour voir le front se former</p></div>
+    </div>
+    <div class="explain-row">
+      <div class="explain-card" style="border-color:rgba(244,114,182,.3)"><h4 style="color:#f472b6">💰 Minimiser Coût</h4><p>Distance × 0.5 + coûts fixes. Poids 30%.</p></div>
+      <div class="explain-card" style="border-color:rgba(74,222,128,.3)"><h4 style="color:#4ade80">🌿 Minimiser CO2</h4><p>0.3 kg CO2/km. Poids 30%.</p></div>
+      <div class="explain-card" style="border-color:rgba(251,146,60,.3)"><h4 style="color:#fb923c">😊 Satisfaction</h4><p>Collecte rapide = citoyens contents. Poids 20%.</p></div>
+      <div class="explain-card" style="border-color:rgba(167,139,250,.3)"><h4 style="color:#a78bfa">⚖️ Équité</h4><p>Répartition équilibrée entre camions. Poids 20%.</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Front de Pareto interactif — Coût vs CO2</div>
+      <div class="stepper-controls">
+        <button class="step-btn primary" onclick="addPareto()">+ Ajouter solution</button>
+        <button class="step-btn" onclick="addManyPareto()">+ 10 solutions</button>
+        <button class="step-btn" onclick="resetPareto()">↺ Vider</button>
+        <span class="step-indicator" id="pareto-count">0 solutions</span>
+      </div>
+      <svg id="pareto-svg" class="demo" viewBox="0 0 500 240" height="240"></svg>
+      <div class="step-desc" id="pareto-desc">Ajoutez des solutions pour voir le front de Pareto (solutions vertes) se former.</div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- 5.4 -->
+  <div class="step" id="l5s4">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div class="step-title-group"><h3>Dominance de Pareto — Définition précise</h3><p>La règle pour identifier les meilleures solutions du front</p></div>
+    </div>
+    <div class="formula">A <strong>domine</strong> B si : <span class="hi">A ≤ B sur TOUS les critères</span> ET <span class="hi">A &lt; B sur AU MOINS UN critère</span></div>
+    <div class="viz-box">
+      <div class="viz-title">Exemple concret — 4 solutions, 2 objectifs à minimiser</div>
+      <svg class="demo" viewBox="0 0 500 210" height="210">
+        <line x1="60" y1="175" x2="460" y2="175" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+        <line x1="60" y1="175" x2="60" y2="20" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+        <text x="260" y="194" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="10" font-family="Sora,sans-serif">Coût (minimiser) →</text>
+        <text x="22" y="100" fill="rgba(255,255,255,.3)" font-size="10" font-family="Sora,sans-serif" transform="rotate(-90,22,100)">CO2 (minimiser) →</text>
+        <!-- Points -->
+        <circle cx="150" cy="80" r="9" fill="rgba(74,222,128,.3)" stroke="#4ade80" stroke-width="2"/>
+        <text x="150" y="84" text-anchor="middle" fill="#4ade80" font-size="10" font-family="Sora,sans-serif" font-weight="700">A</text>
+        <text x="150" y="70" text-anchor="middle" fill="#4ade80" font-size="9" font-family="Sora,sans-serif">✓ Non-dominée</text>
+        <circle cx="290" cy="115" r="9" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="290" y="119" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Sora,sans-serif" font-weight="700">B</text>
+        <text x="290" y="105" text-anchor="middle" fill="#ef4444" font-size="9" font-family="Sora,sans-serif">✗ Dominée par A</text>
+        <circle cx="360" cy="65" r="9" fill="rgba(74,222,128,.3)" stroke="#4ade80" stroke-width="2"/>
+        <text x="360" y="69" text-anchor="middle" fill="#4ade80" font-size="10" font-family="Sora,sans-serif" font-weight="700">C</text>
+        <text x="360" y="55" text-anchor="middle" fill="#4ade80" font-size="9" font-family="Sora,sans-serif">✓ Non-dominée</text>
+        <circle cx="400" cy="130" r="9" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="400" y="134" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Sora,sans-serif" font-weight="700">D</text>
+        <text x="400" y="143" text-anchor="middle" fill="#ef4444" font-size="9" font-family="Sora,sans-serif">✗ Dominée</text>
+        <!-- Zone dominée par A -->
+        <rect x="159" y="89" width="120" height="76" rx="4" fill="rgba(239,68,68,.04)" stroke="rgba(239,68,68,.15)" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="218" y="162" text-anchor="middle" fill="rgba(239,68,68,.35)" font-size="9" font-family="Sora,sans-serif">Zone dominée par A</text>
+        <!-- Front de Pareto -->
+        <path d="M80,50 Q120,55 150,80 Q250,120 360,65 Q420,48 455,40" fill="none" stroke="rgba(74,222,128,.4)" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="440" y="34" fill="rgba(74,222,128,.5)" font-size="9" font-family="Sora,sans-serif">Front Pareto</text>
+        <!-- Explanation -->
+        <text x="80" y="195" fill="rgba(255,255,255,.3)" font-size="9" font-family="Sora,sans-serif">A=(coût:150,CO2:80) ; B=(coût:290,CO2:115) → A&lt;B sur les 2 → A domine B</text>
+      </svg>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">systeme_dynamique.py — dominance + front_pareto()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">domine</span>(scores_a, scores_b, types):
+    <span class="cm">"""True si A domine B. types = liste de 'min'/'max' par objectif."""</span>
+    meilleur_partout    = <span class="kw">True</span>
+    meilleur_quelquepart = <span class="kw">False</span>
+    <span class="kw">for</span> a, b, t <span class="kw">in</span> <span class="fn">zip</span>(scores_a, scores_b, types):
+        <span class="kw">if</span> t == <span class="str">'min'</span>:
+            <span class="kw">if</span> a > b: meilleur_partout = <span class="kw">False</span>
+            <span class="kw">if</span> a < b: meilleur_quelquepart = <span class="kw">True</span>
+        <span class="kw">else</span>:  <span class="cm"># 'max'</span>
+            <span class="kw">if</span> a < b: meilleur_partout = <span class="kw">False</span>
+            <span class="kw">if</span> a > b: meilleur_quelquepart = <span class="kw">True</span>
+    <span class="kw">return</span> meilleur_partout <span class="kw">and</span> meilleur_quelquepart
+
+<span class="kw">def</span> <span class="fn">trouver_front_pareto</span>(solutions, types):
+    n = <span class="fn">len</span>(solutions)
+    est_domine = [<span class="kw">False</span>] * n
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):
+            <span class="kw">if</span> i != j <span class="kw">and</span> <span class="fn">domine</span>(solutions[j], solutions[i], types):
+                est_domine[i] = <span class="kw">True</span>
+                <span class="kw">break</span>
+    <span class="kw">return</span> [s <span class="kw">for</span> s, d <span class="kw">in</span> <span class="fn">zip</span>(solutions, est_domine) <span class="kw">if not</span> d]</pre>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-q">❓ Peut-il y avoir UNE SEULE solution sur le front de Pareto ?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="quiz(this,'correct')">🅐 Oui, si une solution est meilleure sur tous les critères simultanément</div>
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅑 Non, le front de Pareto contient toujours plusieurs solutions</div>
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅒 Non, il faut au minimum autant de solutions que d'objectifs</div>
+      </div>
+      <div class="quiz-feedback" id="qfb3">✅ <strong>Exact !</strong> Si une solution domine toutes les autres sur tous les critères, elle est la seule non-dominée. En pratique, avec des objectifs vraiment contradictoires (coût vs CO2 vs satisfaction), on trouve généralement plusieurs solutions sur le front.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FORMATS JSON ══════════════════ -->
+<section class="level-section" style="--lc:#e2c96e" id="sec-json">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(226,201,110,.07),transparent);border:1px solid rgba(226,201,110,.15)">
+    <div class="level-badge" style="background:rgba(226,201,110,.12);color:#e2c96e">
+      <span style="width:18px;height:18px;background:#e2c96e;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">📄</span>
+      FORMATS DE DONNÉES — JSON
+    </div>
+    <div class="level-title">Structures des fichiers d'entrée / sortie</div>
+    <div class="level-desc">Chaque niveau lit un <strong>fichier JSON d'entrée</strong> et produit un <strong>fichier JSON de sortie</strong>. Voici les formats exacts à respecter pour que votre code soit compatible avec les tests automatiques.</div>
+    <div class="level-goal">🎯 <strong>Important :</strong> Si votre JSON de sortie ne respecte pas ces structures, les tests échoueront même si votre algorithme est correct.</div>
+  </div>
+
+  <!-- JSON N1 -->
+  <div class="step" id="js1">
+    <div class="step-header">
+      <div class="step-number" style="background:#e2c96e;color:#07080f">1</div>
+      <div class="step-title-group"><h3>Niveau 1 — Réseau Routier</h3><p>input_niveau1.json → output_niveau1.json</p></div>
+    </div>
+    <div class="explain-row">
+      <div class="explain-card"><h4>Entrée</h4><p>Un dépôt (id=0), une liste de points_collecte (id, x, y, nom), et des connexions (depart, arrivee, distance — null = calculer automatiquement).</p></div>
+      <div class="explain-card"><h4>Sortie</h4><p>La matrice complète N×N des distances optimales + liste des chemins calculés avec distance et séquence de nœuds.</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/input_niveau1.json</span></div>
+      <pre>{
+  <span class="str">"depot"</span>: { <span class="str">"id"</span>: <span class="num">0</span>, <span class="str">"x"</span>: <span class="num">0</span>, <span class="str">"y"</span>: <span class="num">0</span>, <span class="str">"nom"</span>: <span class="str">"Centre de traitement"</span> },
+  <span class="str">"points_collecte"</span>: [
+    { <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"x"</span>: <span class="num">2.5</span>, <span class="str">"y"</span>: <span class="num">3.1</span>, <span class="str">"nom"</span>: <span class="str">"Quartier Nord"</span> },
+    { <span class="str">"id"</span>: <span class="num">2</span>, <span class="str">"x"</span>: <span class="num">5.2</span>, <span class="str">"y"</span>: <span class="num">4.8</span>, <span class="str">"nom"</span>: <span class="str">"Centre Ville"</span> },
+    { <span class="str">"id"</span>: <span class="num">3</span>, <span class="str">"x"</span>: <span class="num">7.8</span>, <span class="str">"y"</span>: <span class="num">1.2</span>, <span class="str">"nom"</span>: <span class="str">"Zone Industrielle"</span> }
+  ],
+  <span class="str">"connexions"</span>: [
+    { <span class="str">"depart"</span>: <span class="num">0</span>, <span class="str">"arrivee"</span>: <span class="num">1</span>, <span class="str">"distance"</span>: <span class="kw">null</span> },  <span class="cm">// null → calculer euclidienne</span>
+    { <span class="str">"depart"</span>: <span class="num">1</span>, <span class="str">"arrivee"</span>: <span class="num">2</span>, <span class="str">"distance"</span>: <span class="num">4.2</span> }   <span class="cm">// valeur fixe fournie</span>
+  ]
+}</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/output_niveau1.json</span></div>
+      <pre>{
+  <span class="str">"matrice_distances"</span>: [
+    [<span class="num">0.0</span>,  <span class="num">3.9</span>,  <span class="num">6.8</span>,  <span class="num">8.1</span>],
+    [<span class="num">3.9</span>,  <span class="num">0.0</span>,  <span class="num">4.2</span>,  <span class="num">6.5</span>],   <span class="cm">// matrice symétrique (i,j) = (j,i)</span>
+    [<span class="num">6.8</span>,  <span class="num">4.2</span>,  <span class="num">0.0</span>,  <span class="num">5.3</span>],
+    [<span class="num">8.1</span>,  <span class="num">6.5</span>,  <span class="num">5.3</span>,  <span class="num">0.0</span>]
+  ],
+  <span class="str">"chemins_calcules"</span>: [
+    {
+      <span class="str">"depart"</span>: <span class="num">0</span>,
+      <span class="str">"arrivee"</span>: <span class="num">3</span>,
+      <span class="str">"distance"</span>: <span class="num">8.1</span>,
+      <span class="str">"chemin"</span>: [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]   <span class="cm">// séquence de nœuds du chemin optimal</span>
+    }
+  ]
+}</pre>
+    </div>
+    <div class="callout warn"><span class="callout-icon">⚠️</span><span>La matrice doit être carrée (N×N) et symétrique. La diagonale est toujours 0.0. Vérifiez que <code>matrice[i][j] == matrice[j][i]</code> pour tous i,j.</span></div>
+  </div>
+  <hr class="divider">
+
+  <!-- JSON N2 -->
+  <div class="step" id="js2">
+    <div class="step-header">
+      <div class="step-number" style="background:#e2c96e;color:#07080f">2</div>
+      <div class="step-title-group"><h3>Niveau 2 — Affectation Camion ↔ Zone</h3><p>input_niveau2.json → output_niveau2.json</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/input_niveau2.json</span></div>
+      <pre>{
+  <span class="str">"camions"</span>: [
+    {
+      <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"capacite"</span>: <span class="num">5000</span>, <span class="str">"cout_fixe"</span>: <span class="num">200</span>,
+      <span class="str">"zones_accessibles"</span>: [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>],          <span class="cm">// IDs des zones que ce camion peut servir</span>
+      <span class="str">"position_initial"</span>: { <span class="str">"x"</span>: <span class="num">0</span>, <span class="str">"y"</span>: <span class="num">0</span> }
+    }
+  ],
+  <span class="str">"zones"</span>: [
+    {
+      <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"points"</span>: [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>],
+      <span class="str">"volume_moyen"</span>: <span class="num">1200</span>,                      <span class="cm">// kg collectés en moyenne</span>
+      <span class="str">"centre"</span>: { <span class="str">"x"</span>: <span class="num">3.5</span>, <span class="str">"y"</span>: <span class="num">4.2</span> },
+      <span class="str">"frequence_collecte"</span>: <span class="str">"quotidien"</span>
+    }
+  ],
+  <span class="str">"contraintes"</span>: {
+    <span class="str">"capacite_max_par_camion"</span>: <span class="num">6000</span>,
+    <span class="str">"zones_incompatibles"</span>: [[<span class="num">1</span>, <span class="num">2</span>]],           <span class="cm">// zones 1 et 2 ne peuvent être au même camion</span>
+    <span class="str">"priorites"</span>: [{ <span class="str">"zone_id"</span>: <span class="num">1</span>, <span class="str">"priorite"</span>: <span class="str">"haute"</span> }]
+  }
+}</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/output_niveau2.json</span></div>
+      <pre>{
+  <span class="str">"affectation"</span>: [
+    {
+      <span class="str">"camion_id"</span>: <span class="num">1</span>,
+      <span class="str">"zones_affectees"</span>: [<span class="num">1</span>, <span class="num">3</span>, <span class="num">5</span>],
+      <span class="str">"charge_totale"</span>: <span class="num">4500</span>,            <span class="cm">// somme des volumes_moyen des zones</span>
+      <span class="str">"cout_estime"</span>: <span class="num">320.5</span>,
+      <span class="str">"pourcentage_utilisation"</span>: <span class="num">90</span>    <span class="cm">// charge_totale / capacite × 100</span>
+    }
+  ],
+  <span class="str">"statistiques"</span>: {
+    <span class="str">"nombre_camions_utilises"</span>: <span class="num">3</span>,
+    <span class="str">"charge_moyenne"</span>: <span class="num">4200</span>,
+    <span class="str">"ecart_type_charge"</span>: <span class="num">350</span>,         <span class="cm">// test 2.4 : doit être < 20% de la moyenne</span>
+    <span class="str">"zones_non_affectees"</span>: []          <span class="cm">// [] si toutes affectées, sinon liste d'IDs</span>
+  }
+}</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- JSON N3 -->
+  <div class="step" id="js3">
+    <div class="step-header">
+      <div class="step-number" style="background:#e2c96e;color:#07080f">3</div>
+      <div class="step-title-group"><h3>Niveau 3 — Créneaux Temporels</h3><p>input_niveau3.json → output_niveau3.json</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/input_niveau3.json</span></div>
+      <pre>{
+  <span class="str">"creneaux"</span>: [
+    {
+      <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"debut"</span>: <span class="str">"08:00"</span>, <span class="str">"fin"</span>: <span class="str">"10:00"</span>, <span class="str">"jour"</span>: <span class="str">"lundi"</span>,
+      <span class="str">"niveau_congestion"</span>: <span class="num">1.2</span>,           <span class="cm">// 1.0 = normal, 2.0 = très chargé</span>
+      <span class="str">"zones_exclusives"</span>: [<span class="num">3</span>, <span class="num">5</span>]          <span class="cm">// seules ces zones autorisées sur ce créneau</span>
+    }
+  ],
+  <span class="str">"contraintes_temporelles"</span>: {
+    <span class="str">"fenetres_zone"</span>: [
+      { <span class="str">"zone_id"</span>: <span class="num">1</span>, <span class="str">"debut"</span>: <span class="str">"06:00"</span>, <span class="str">"fin"</span>: <span class="str">"18:00"</span> }
+    ],
+    <span class="str">"pauses_obligatoires"</span>: [
+      { <span class="str">"camion_id"</span>: <span class="num">1</span>, <span class="str">"debut"</span>: <span class="str">"12:00"</span>, <span class="str">"duree"</span>: <span class="num">1</span> }  <span class="cm">// 1h de pause déjeuner</span>
+    ],
+    <span class="str">"zones_interdites_nuit"</span>: [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]  <span class="cm">// zones résidentielles → pas après 22h</span>
+  },
+  <span class="str">"horizon_planification"</span>: {
+    <span class="str">"date_debut"</span>: <span class="str">"2024-01-15"</span>, <span class="str">"date_fin"</span>: <span class="str">"2024-01-21"</span>,
+    <span class="str">"pas_temps"</span>: <span class="num">30</span>                 <span class="cm">// granularité en minutes</span>
+  }
+}</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/output_niveau3.json</span></div>
+      <pre>{
+  <span class="str">"planification_hebdomadaire"</span>: {
+    <span class="str">"lundi"</span>: [
+      {
+        <span class="str">"camion_id"</span>: <span class="num">1</span>, <span class="str">"zone_id"</span>: <span class="num">2</span>,
+        <span class="str">"creneau"</span>: { <span class="str">"debut"</span>: <span class="str">"08:00"</span>, <span class="str">"fin"</span>: <span class="str">"10:00"</span> },
+        <span class="str">"taches"</span>: [
+          { <span class="str">"point_id"</span>: <span class="num">5</span>, <span class="str">"ordre"</span>: <span class="num">1</span>, <span class="str">"heure_estimee"</span>: <span class="str">"08:30"</span> },
+          { <span class="str">"point_id"</span>: <span class="num">7</span>, <span class="str">"ordre"</span>: <span class="num">2</span>, <span class="str">"heure_estimee"</span>: <span class="str">"09:15"</span> }
+        ],
+        <span class="str">"duree_totale"</span>: <span class="num">120</span>,           <span class="cm">// en minutes</span>
+        <span class="str">"retard_estime"</span>: <span class="num">0</span>             <span class="cm">// minutes de retard prévu</span>
+      }
+    ]
+  },
+  <span class="str">"indicateurs"</span>: {
+    <span class="str">"taux_occupation"</span>: <span class="num">85.3</span>,         <span class="cm">// test 3.4 : doit être > 70%</span>
+    <span class="str">"respect_horaires"</span>: <span class="num">92.1</span>,
+    <span class="str">"congestion_moyenne"</span>: <span class="num">1.15</span>,
+    <span class="str">"retard_moyen"</span>: <span class="num">4.2</span>
+  }
+}</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- JSON N4 -->
+  <div class="step" id="js4">
+    <div class="step-header">
+      <div class="step-number" style="background:#e2c96e;color:#07080f">4</div>
+      <div class="step-title-group"><h3>Niveau 4 — VRP Enrichi</h3><p>input_niveau4.json → output_niveau4.json</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/input_niveau4.json</span></div>
+      <pre>{
+  <span class="str">"configuration_vrp"</span>: {
+    <span class="str">"nombre_camions"</span>: <span class="num">3</span>,
+    <span class="str">"strategie_construction"</span>: <span class="str">"plus_proche_voisin"</span>,
+    <span class="str">"methode_amelioration"</span>: <span class="str">"2opt"</span>,
+    <span class="str">"critere_arret"</span>: { <span class="str">"iterations"</span>: <span class="num">100</span>, <span class="str">"stagnation"</span>: <span class="num">10</span> }
+  },
+  <span class="str">"points_detail"</span>: [
+    {
+      <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"type"</span>: <span class="str">"conteneur"</span>,
+      <span class="str">"capacite"</span>: <span class="num">120</span>,               <span class="cm">// capacité max du conteneur (L)</span>
+      <span class="str">"niveau_actuel"</span>: <span class="num">85</span>,            <span class="cm">// % de remplissage → demande = capacité × niveau</span>
+      <span class="str">"temps_service"</span>: <span class="num">5</span>,            <span class="cm">// minutes pour vider le conteneur</span>
+      <span class="str">"fenetre"</span>: { <span class="str">"debut"</span>: <span class="str">"06:00"</span>, <span class="str">"fin"</span>: <span class="str">"20:00"</span> },
+      <span class="str">"restrictions"</span>: { <span class="str">"camion_mini"</span>: <span class="kw">null</span>, <span class="str">"acces"</span>: <span class="str">"facile"</span> }
+    }
+  ],
+  <span class="str">"parametres_optimisation"</span>: {
+    <span class="str">"poids_distance"</span>: <span class="num">1.0</span>,
+    <span class="str">"poids_temps"</span>: <span class="num">1.5</span>,
+    <span class="str">"poids_equilibre"</span>: <span class="num">0.8</span>,
+    <span class="str">"penalite_retard"</span>: <span class="num">10.0</span>         <span class="cm">// €/minute de retard</span>
+  }
+}</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/output_niveau4.json</span></div>
+      <pre>{
+  <span class="str">"tournees_optimisees"</span>: [
+    {
+      <span class="str">"camion_id"</span>: <span class="num">1</span>,
+      <span class="str">"points_ordre"</span>: [<span class="num">0</span>, <span class="num">3</span>, <span class="num">7</span>, <span class="num">2</span>, <span class="num">5</span>, <span class="num">0</span>],  <span class="cm">// commence et finit au dépôt (id=0)</span>
+      <span class="str">"distance_totale"</span>: <span class="num">24.5</span>,
+      <span class="str">"duree_estimee"</span>: <span class="num">185</span>,              <span class="cm">// minutes, incluant temps_service</span>
+      <span class="str">"charge_finale"</span>: <span class="num">4200</span>,
+      <span class="str">"heure_depart"</span>: <span class="str">"08:00"</span>,
+      <span class="str">"heure_retour_estimee"</span>: <span class="str">"11:05"</span>,
+      <span class="str">"couts"</span>: { <span class="str">"carburant"</span>: <span class="num">18.5</span>, <span class="str">"maintenance"</span>: <span class="num">3.2</span>, <span class="str">"total"</span>: <span class="num">21.7</span> }
+    }
+  ],
+  <span class="str">"performance"</span>: {
+    <span class="str">"distance_totale"</span>: <span class="num">78.3</span>,
+    <span class="str">"duree_moyenne_tournee"</span>: <span class="num">172</span>,
+    <span class="str">"ecart_type_charge"</span>: <span class="num">320</span>,
+    <span class="str">"taux_utilisation_camions"</span>: <span class="num">88.5</span>,
+    <span class="str">"amelioration_vs_initial"</span>: <span class="num">23.7</span>   <span class="cm">// test 4.4 : doit être > 15%</span>
+  },
+  <span class="str">"visualisations"</span>: {
+    <span class="str">"carte"</span>: <span class="str">"output/tournees_carte.png"</span>,
+    <span class="str">"gantt"</span>: <span class="str">"output/gantt_tournees.png"</span>,
+    <span class="str">"statistiques"</span>: <span class="str">"output/stats_detaillees.csv"</span>
+  }
+}</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- JSON N5 -->
+  <div class="step" id="js5">
+    <div class="step-header">
+      <div class="step-number" style="background:#e2c96e;color:#07080f">5</div>
+      <div class="step-title-group"><h3>Niveau 5 — Système Dynamique</h3><p>input_niveau5.json → output_niveau5.json</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/input_niveau5.json (extrait clé)</span></div>
+      <pre>{
+  <span class="str">"simulation"</span>: {
+    <span class="str">"duree_jours"</span>: <span class="num">3</span>, <span class="str">"pas_temps_minutes"</span>: <span class="num">30</span>,
+    <span class="str">"heure_debut"</span>: <span class="str">"06:00"</span>, <span class="str">"heure_fin"</span>: <span class="str">"20:00"</span>
+  },
+  <span class="str">"capteurs_iot"</span>: [
+    { <span class="str">"point_id"</span>: <span class="num">1</span>, <span class="str">"seuils"</span>: { <span class="str">"avertissement"</span>: <span class="num">70</span>, <span class="str">"urgence"</span>: <span class="num">90</span> } }
+  ],
+  <span class="str">"objectifs"</span>: [
+    { <span class="str">"nom"</span>: <span class="str">"cout"</span>,        <span class="str">"type"</span>: <span class="str">"minimiser"</span>, <span class="str">"poids"</span>: <span class="num">0.3</span> },
+    { <span class="str">"nom"</span>: <span class="str">"co2"</span>,         <span class="str">"type"</span>: <span class="str">"minimiser"</span>, <span class="str">"poids"</span>: <span class="num">0.3</span> },
+    { <span class="str">"nom"</span>: <span class="str">"satisfaction"</span>, <span class="str">"type"</span>: <span class="str">"maximiser"</span>, <span class="str">"poids"</span>: <span class="num">0.2</span> },
+    { <span class="str">"nom"</span>: <span class="str">"equite"</span>,      <span class="str">"type"</span>: <span class="str">"maximiser"</span>, <span class="str">"poids"</span>: <span class="num">0.2</span> }
+  ],
+  <span class="str">"evenements_aleatoires"</span>: [
+    { <span class="str">"type"</span>: <span class="str">"panne_camion"</span>,  <span class="str">"probabilite"</span>: <span class="num">0.05</span>, <span class="str">"impact"</span>: <span class="str">"redistribution_points"</span> },
+    { <span class="str">"type"</span>: <span class="str">"trafic_intense"</span>, <span class="str">"probabilite"</span>: <span class="num">0.15</span>, <span class="str">"impact"</span>: { <span class="str">"vitesse_reduite"</span>: <span class="num">0.5</span> } }
+  ]
+}</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">data/output_niveau5.json (structure)</span></div>
+      <pre>{
+  <span class="str">"simulation_resultats"</span>: {
+    <span class="str">"jour_1"</span>: {
+      <span class="str">"tournees_executees"</span>: <span class="num">8</span>,
+      <span class="str">"distance_totale"</span>: <span class="num">156.7</span>,
+      <span class="str">"emissions_co2"</span>: <span class="num">47.0</span>,      <span class="cm">// kg CO2 (distance × 0.3)</span>
+      <span class="str">"couts_totaux"</span>: <span class="num">1250.5</span>,
+      <span class="str">"evenements"</span>: [
+        { <span class="str">"type"</span>: <span class="str">"panne"</span>, <span class="str">"camion"</span>: <span class="num">2</span>, <span class="str">"duree"</span>: <span class="num">95</span>, <span class="str">"impact"</span>: <span class="str">"mineur"</span> }
+      ],
+      <span class="str">"satisfaction_moyenne"</span>: <span class="num">88.5</span>
+    }
+  },
+  <span class="str">"front_pareto"</span>: [
+    { <span class="str">"solution_id"</span>: <span class="num">1</span>,
+      <span class="str">"scores"</span>: { <span class="str">"cout"</span>: <span class="num">1200</span>, <span class="str">"co2"</span>: <span class="num">45</span>, <span class="str">"satisfaction"</span>: <span class="num">90</span>, <span class="str">"equite"</span>: <span class="num">85</span> },
+      <span class="str">"dominance"</span>: <span class="str">"non_dominee"</span> }
+  ],
+  <span class="str">"dashboard"</span>: {
+    <span class="str">"indicateurs_temps_reel"</span>: {
+      <span class="str">"co2_instantane"</span>: <span class="num">2.3</span>,
+      <span class="str">"points_urgents_actuels"</span>: [<span class="num">7</span>, <span class="num">12</span>, <span class="num">25</span>]  <span class="cm">// IDs à collecter en urgence</span>
+    }
+  }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ ARCHITECTURE ══════════════════ -->
+<section class="level-section" style="--lc:#38bdf8" id="sec-arch">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(56,189,248,.07),transparent);border:1px solid rgba(56,189,248,.15)">
+    <div class="level-badge" style="background:rgba(56,189,248,.12);color:#38bdf8">
+      <span style="width:18px;height:18px;background:#38bdf8;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">🗂</span>
+      ARCHITECTURE DU PROJET
+    </div>
+    <div class="level-title">Structure des fichiers, tests & barème</div>
+    <div class="level-desc">Le projet est organisé en <strong>5 dossiers niveau</strong> + un module <strong>commun</strong> partagé. Chaque niveau est indépendant mais réutilise les classes des niveaux précédents.</div>
+    <div class="level-goal">🎯 Si vous ne respectez pas l'arborescence, votre code ne sera pas évalué automatiquement.</div>
+  </div>
+
+  <!-- Arborescence -->
+  <div class="step" id="arch1">
+    <div class="step-header">
+      <div class="step-number" style="background:#38bdf8;color:#07080f">1</div>
+      <div class="step-title-group"><h3>Arborescence complète du projet</h3><p>Structure de dossiers à reproduire exactement</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">Structure projet_collecte_dechets/</span></div>
+      <pre><span class="str">projet_collecte_dechets/</span>
+├── <span class="fn">niveau1/</span>
+│   ├── src/
+│   │   ├── <span class="cls">point_collecte.py</span>
+│   │   ├── <span class="cls">graphe_routier.py</span>
+│   │   └── <span class="cls">main_niveau1.py</span>
+│   ├── data/
+│   │   ├── input_niveau1.json
+│   │   └── output_niveau1.json      <span class="cm"># généré par votre code</span>
+│   └── tests/
+│       └── <span class="cls">test_niveau1.py</span>
+├── <span class="fn">niveau2/</span>
+│   ├── src/
+│   │   ├── <span class="cls">camion.py</span>
+│   │   ├── <span class="cls">zone.py</span>
+│   │   ├── <span class="cls">affectateur_biparti.py</span>
+│   │   └── <span class="cls">main_niveau2.py</span>
+│   ├── data/ └── tests/
+├── <span class="fn">niveau3/</span>
+│   ├── src/
+│   │   ├── <span class="cls">creneau_horaire.py</span>
+│   │   ├── <span class="cls">contrainte_temporelle.py</span>
+│   │   ├── <span class="cls">planificateur_triparti.py</span>
+│   │   └── <span class="cls">main_niveau3.py</span>
+│   ├── data/ └── tests/
+├── <span class="fn">niveau4/</span>
+│   ├── src/
+│   │   ├── <span class="cls">tournee.py</span>
+│   │   ├── <span class="cls">optimiseur_vrp.py</span>
+│   │   ├── <span class="cls">visualiseur_tournees.py</span>
+│   │   └── <span class="cls">main_niveau4.py</span>
+│   ├── data/ ├── tests/ └── <span class="fn">visualisations/</span>  <span class="cm"># PNG générés auto</span>
+├── <span class="fn">niveau5/</span>
+│   ├── src/
+│   │   ├── <span class="cls">capteur_iot.py</span>
+│   │   ├── <span class="cls">simulateur_temps_reel.py</span>
+│   │   ├── <span class="cls">optimiseur_multi_objectif.py</span>
+│   │   ├── <span class="cls">dashboard_temps_reel.py</span>
+│   │   └── <span class="cls">main_niveau5.py</span>
+│   ├── data/ ├── tests/ └── <span class="fn">dashboards/</span>
+├── <span class="fn">commun/</span>                               <span class="cm"># ← PARTAGÉ par tous les niveaux</span>
+│   ├── <span class="cls">outils_math.py</span>
+│   ├── <span class="cls">parseur_json.py</span>
+│   ├── <span class="cls">validateurs.py</span>
+│   └── <span class="cls">constantes.py</span>
+└── <span class="cls">README.md</span></pre>
+    </div>
+    <div class="callout info"><span class="callout-icon">💡</span><span>Créer toute la structure d'un coup avec bash : <code>mkdir -p projet_collecte_dechets/{niveau{1..5}/{src,data,tests},commun}</code></span></div>
+  </div>
+  <hr class="divider">
+
+  <!-- Module commun -->
+  <div class="step" id="arch2">
+    <div class="step-header">
+      <div class="step-number" style="background:#38bdf8;color:#07080f">2</div>
+      <div class="step-title-group"><h3>Module commun/ — Classes partagées</h3><p>Ces fichiers sont importés par tous les niveaux — à écrire en premier</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">commun/parseur_json.py</span></div>
+      <pre><span class="kw">import</span> json
+
+<span class="kw">def</span> <span class="fn">charger_configuration</span>(chemin: str) -> dict:
+    <span class="str">"""Charge et valide un fichier JSON de configuration."""</span>
+    <span class="kw">with</span> <span class="fn">open</span>(chemin, <span class="str">'r'</span>, encoding=<span class="str">'utf-8'</span>) <span class="kw">as</span> f:
+        <span class="kw">return</span> json.<span class="fn">load</span>(f)
+
+<span class="kw">def</span> <span class="fn">sauvegarder_resultats</span>(chemin: str, donnees: dict) -> None:
+    <span class="str">"""Sauvegarde les résultats au format JSON indenté."""</span>
+    <span class="kw">with</span> <span class="fn">open</span>(chemin, <span class="str">'w'</span>, encoding=<span class="str">'utf-8'</span>) <span class="kw">as</span> f:
+        json.<span class="fn">dump</span>(donnees, f, indent=<span class="num">2</span>, ensure_ascii=<span class="kw">False</span>)</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">commun/outils_math.py</span></div>
+      <pre><span class="kw">import</span> math
+
+<span class="kw">def</span> <span class="fn">distance_euclidienne</span>(x1, y1, x2, y2) -> float:
+    <span class="kw">return</span> math.<span class="fn">sqrt</span>((x2 - x1)**<span class="num">2</span> + (y2 - y1)**<span class="num">2</span>)
+
+<span class="kw">def</span> <span class="fn">ecart_type</span>(valeurs: list) -> float:
+    n = <span class="fn">len</span>(valeurs)
+    <span class="kw">if</span> n == <span class="num">0</span>: <span class="kw">return</span> <span class="num">0.0</span>
+    mu = <span class="fn">sum</span>(valeurs) / n
+    <span class="kw">return</span> math.<span class="fn">sqrt</span>(<span class="fn">sum</span>((v - mu)**<span class="num">2</span> <span class="kw">for</span> v <span class="kw">in</span> valeurs) / n)
+
+<span class="kw">def</span> <span class="fn">distance_route</span>(tournee: list, matrice: list) -> float:
+    <span class="str">"""Calcule distance totale d'une tournée (liste d'indices)."""</span>
+    <span class="kw">return</span> <span class="fn">sum</span>(matrice[tournee[i]][tournee[i+<span class="num">1</span>]]
+               <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(tournee) - <span class="num">1</span>))</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">commun/constantes.py</span></div>
+      <pre><span class="cm"># Constantes utilisées dans tous les niveaux</span>
+CO2_PAR_KM     = <span class="num">0.3</span>   <span class="cm"># kg de CO2 par km parcouru</span>
+CARBURANT_PAR_KM = <span class="num">0.5</span> <span class="cm"># € par km</span>
+VITESSE_MOYENNE  = <span class="num">30</span>  <span class="cm"># km/h en ville</span>
+SEUIL_URGENCE    = <span class="num">90</span>  <span class="cm"># % remplissage → replanification</span>
+SEUIL_ALERTE     = <span class="num">80</span>  <span class="cm"># % remplissage → notification</span>
+TAILLE_LISTE_TABOU = <span class="num">10</span> <span class="cm"># nombre de mouvements mémorisés</span></pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- Réutilisation -->
+  <div class="step" id="arch3">
+    <div class="step-header">
+      <div class="step-number" style="background:#38bdf8;color:#07080f">3</div>
+      <div class="step-title-group"><h3>Réutilisation entre niveaux</h3><p>Chaque niveau étend ou importe le précédent — ne pas tout réécrire !</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Dépendances entre niveaux</div>
+      <svg class="demo" viewBox="0 0 500 200" height="200">
+        <!-- N1 -->
+        <rect x="10" y="80" width="80" height="40" rx="8" fill="rgba(34,211,238,.15)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="50" y="97" text-anchor="middle" fill="#22d3ee" font-size="10" font-weight="700" font-family="Sora,sans-serif">N1</text>
+        <text x="50" y="110" text-anchor="middle" fill="rgba(34,211,238,.6)" font-size="8" font-family="Sora,sans-serif">GrapheRoutier</text>
+        <!-- N2 -->
+        <rect x="115" y="55" width="85" height="60" rx="8" fill="rgba(167,139,250,.15)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="157" y="75" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700" font-family="Sora,sans-serif">N2</text>
+        <text x="157" y="88" text-anchor="middle" fill="rgba(167,139,250,.6)" font-size="8" font-family="Sora,sans-serif">Camion, Zone</text>
+        <text x="157" y="100" text-anchor="middle" fill="rgba(167,139,250,.6)" font-size="8" font-family="Sora,sans-serif">Affectateur</text>
+        <text x="157" y="110" text-anchor="middle" fill="rgba(167,139,250,.4)" font-size="7" font-family="Sora,sans-serif">+ GrapheRoutier</text>
+        <!-- N3 -->
+        <rect x="225" y="40" width="85" height="80" rx="8" fill="rgba(251,146,60,.15)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="268" y="58" text-anchor="middle" fill="#fb923c" font-size="10" font-weight="700" font-family="Sora,sans-serif">N3</text>
+        <text x="268" y="71" text-anchor="middle" fill="rgba(251,146,60,.6)" font-size="8" font-family="Sora,sans-serif">Creneau</text>
+        <text x="268" y="83" text-anchor="middle" fill="rgba(251,146,60,.6)" font-size="8" font-family="Sora,sans-serif">Contrainte</text>
+        <text x="268" y="95" text-anchor="middle" fill="rgba(251,146,60,.6)" font-size="8" font-family="Sora,sans-serif">Planificateur</text>
+        <text x="268" y="110" text-anchor="middle" fill="rgba(251,146,60,.4)" font-size="7" font-family="Sora,sans-serif">+ N1 + N2</text>
+        <!-- N4 -->
+        <rect x="335" y="25" width="75" height="100" rx="8" fill="rgba(74,222,128,.15)" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="373" y="43" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="700" font-family="Sora,sans-serif">N4</text>
+        <text x="373" y="56" text-anchor="middle" fill="rgba(74,222,128,.6)" font-size="8" font-family="Sora,sans-serif">Tournee</text>
+        <text x="373" y="68" text-anchor="middle" fill="rgba(74,222,128,.6)" font-size="8" font-family="Sora,sans-serif">OptimiseurVRP</text>
+        <text x="373" y="80" text-anchor="middle" fill="rgba(74,222,128,.6)" font-size="8" font-family="Sora,sans-serif">Visualiseur</text>
+        <text x="373" y="118" text-anchor="middle" fill="rgba(74,222,128,.4)" font-size="7" font-family="Sora,sans-serif">+ N1+N2+N3</text>
+        <!-- N5 -->
+        <rect x="430" y="10" width="65" height="130" rx="8" fill="rgba(244,114,182,.15)" stroke="#f472b6" stroke-width="1.5"/>
+        <text x="462" y="28" text-anchor="middle" fill="#f472b6" font-size="10" font-weight="700" font-family="Sora,sans-serif">N5</text>
+        <text x="462" y="41" text-anchor="middle" fill="rgba(244,114,182,.6)" font-size="8" font-family="Sora,sans-serif">Capteur</text>
+        <text x="462" y="53" text-anchor="middle" fill="rgba(244,114,182,.6)" font-size="8" font-family="Sora,sans-serif">Simulateur</text>
+        <text x="462" y="65" text-anchor="middle" fill="rgba(244,114,182,.6)" font-size="8" font-family="Sora,sans-serif">MultiObj</text>
+        <text x="462" y="77" text-anchor="middle" fill="rgba(244,114,182,.6)" font-size="8" font-family="Sora,sans-serif">Dashboard</text>
+        <text x="462" y="134" text-anchor="middle" fill="rgba(244,114,182,.4)" font-size="7" font-family="Sora,sans-serif">+ N1→N4</text>
+        <!-- Arrows -->
+        <line x1="90" y1="100" x2="115" y2="90" stroke="rgba(255,255,255,.2)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="200" y1="80" x2="225" y2="75" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+        <line x1="310" y1="70" x2="335" y2="65" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+        <line x1="410" y1="60" x2="430" y2="55" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+        <!-- Import labels -->
+        <text x="50" y="155" text-anchor="middle" fill="rgba(34,211,238,.5)" font-size="9" font-family="JetBrains Mono,monospace">from niveau1.graphe_routier</text>
+        <text x="50" y="167" text-anchor="middle" fill="rgba(34,211,238,.5)" font-size="9" font-family="JetBrains Mono,monospace">import GrapheRoutier</text>
+        <text x="350" y="185" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="8" font-family="Sora,sans-serif">Chaque flèche = import du niveau précédent</text>
+      </svg>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">Exemple d'import dans main_niveau4.py</span></div>
+      <pre><span class="cm"># main_niveau4.py importe des niveaux précédents</span>
+<span class="kw">import</span> sys
+sys.path.<span class="fn">append</span>(<span class="str">'..'</span>)  <span class="cm"># accès aux dossiers frères</span>
+
+<span class="kw">from</span> commun.parseur_json <span class="kw">import</span> charger_configuration, sauvegarder_resultats
+<span class="kw">from</span> commun.constantes <span class="kw">import</span> VITESSE_MOYENNE, CO2_PAR_KM
+<span class="kw">from</span> niveau1.src.graphe_routier <span class="kw">import</span> GrapheRoutier
+<span class="kw">from</span> niveau2.src.camion <span class="kw">import</span> Camion
+<span class="kw">from</span> niveau4.src.tournee <span class="kw">import</span> Tournee
+<span class="kw">from</span> niveau4.src.optimiseur_vrp <span class="kw">import</span> OptimiseurVRP</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- Tests et Barème -->
+  <div class="step" id="arch4">
+    <div class="step-header">
+      <div class="step-number" style="background:#38bdf8;color:#07080f">4</div>
+      <div class="step-title-group"><h3>Tests de validation & Barème d'évaluation</h3><p>Les critères exacts qui seront vérifiés lors de la correction</p></div>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Barème par niveau</div>
+      <table class="nice-table">
+        <thead><tr><th>Critère</th><th>Poids</th><th>Tests à passer</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--n1)">Fonctionnalité N1 — Graphe</td><td><span style="color:#4ade80;font-weight:700">10%</span></td><td>Matrice 10×10, symétrie, inégalité triangulaire</td></tr>
+          <tr><td style="color:var(--n2)">Fonctionnalité N2 — Affectation</td><td><span style="color:#4ade80;font-weight:700">15%</span></td><td>Capacité respectée, écart-type &lt; 20%</td></tr>
+          <tr><td style="color:var(--n3)">Fonctionnalité N3 — Temporel</td><td><span style="color:#4ade80;font-weight:700">15%</span></td><td>0 chevauchement, taux occupation &gt; 70%</td></tr>
+          <tr><td style="color:var(--n4)">Fonctionnalité N4 — VRP</td><td><span style="color:#4ade80;font-weight:700">20%</span></td><td>Amélioration &gt; 15% vs naïf, 2-opt valide</td></tr>
+          <tr><td style="color:var(--n5)">Fonctionnalité N5 — Dynamique</td><td><span style="color:#4ade80;font-weight:700">20%</span></td><td>Urgence détectée, replanif &lt; 2s</td></tr>
+          <tr><td>Qualité du code</td><td><span style="color:#fb923c;font-weight:700">10%</span></td><td>PEP8, docstrings, commentaires</td></tr>
+          <tr><td>Tests unitaires</td><td><span style="color:#fb923c;font-weight:700">5%</span></td><td>Couverture &gt; 80%</td></tr>
+          <tr><td>Rapport technique</td><td><span style="color:#fb923c;font-weight:700">5%</span></td><td>Clarté, analyse des résultats</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="viz-box">
+      <div class="viz-title">Checklist de tests par niveau</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11px">
+        <div style="padding:10px;background:rgba(34,211,238,.05);border:1px solid rgba(34,211,238,.15);border-radius:8px">
+          <div style="color:var(--n1);font-weight:700;margin-bottom:6px">N1 — 4 tests</div>
+          <div style="color:var(--muted);line-height:1.8">✦ Charger 10 points → matrice 10×10<br>✦ Chemin 0→5, distance > 0<br>✦ Symétrie : dist(i,j) = dist(j,i)<br>✦ Inégalité triangulaire</div>
+        </div>
+        <div style="padding:10px;background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.15);border-radius:8px">
+          <div style="color:var(--n2);font-weight:700;margin-bottom:6px">N2 — 4 tests</div>
+          <div style="color:var(--muted);line-height:1.8">✦ 5 zones → 3 camions capacités variées<br>✦ Aucun camion ne dépasse capacité<br>✦ Zone inaccessible → erreur levée<br>✦ Écart-type charges &lt; 20% moyenne</div>
+        </div>
+        <div style="padding:10px;background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.15);border-radius:8px">
+          <div style="color:var(--n3);font-weight:700;margin-bottom:6px">N3 — 4 tests</div>
+          <div style="color:var(--muted);line-height:1.8">✦ 3 camions, 5 créneaux, 10 zones<br>✦ Zéro chevauchement pour même camion<br>✦ Fenêtre interdite → refusé<br>✦ Taux occupation &gt; 70%</div>
+        </div>
+        <div style="padding:10px;background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.15);border-radius:8px">
+          <div style="color:var(--n4);font-weight:700;margin-bottom:6px">N4 — 4 tests</div>
+          <div style="color:var(--muted);line-height:1.8">✦ 20 points, 3 camions<br>✦ 2-opt améliore la solution initiale<br>✦ Capacité dépassée → erreur levée<br>✦ Amélioration &gt; 15% vs naïf</div>
+        </div>
+        <div style="padding:10px;background:rgba(244,114,182,.05);border:1px solid rgba(244,114,182,.15);border-radius:8px;grid-column:1/-1">
+          <div style="color:var(--n5);font-weight:700;margin-bottom:6px">N5 — 4 tests</div>
+          <div style="color:var(--muted);line-height:1.8">✦ Simuler 1 jour avec 5 événements aléatoires &nbsp;✦ Détecter urgence quand remplissage &gt; 90%<br>✦ Replanification en &lt; 2 minutes (temps réel) &nbsp;✦ Amélioration multi-objectif &gt; 10%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ MÉTHODES MANQUANTES ══════════════════ -->
+<section class="level-section" style="--lc:#f87171" id="sec-mc">
+  <div class="level-hero" style="background:linear-gradient(135deg,rgba(248,113,113,.07),transparent);border:1px solid rgba(248,113,113,.15)">
+    <div class="level-badge" style="background:rgba(248,113,113,.12);color:#f87171">
+      <span style="width:18px;height:18px;background:#f87171;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#07080f">🔧</span>
+      MÉTHODES CLÉS NON EXPLIQUÉES
+    </div>
+    <div class="level-title">Code complet des méthodes manquantes</div>
+    <div class="level-desc">Ces méthodes sont exigées dans le cahier des charges mais n'étaient pas expliquées dans le guide initial. Voici leur implémentation complète et annotée.</div>
+  </div>
+
+  <!-- calculer_penalite -->
+  <div class="step" id="mc1">
+    <div class="step-header">
+      <div class="step-number" style="background:#f87171;color:#07080f">1</div>
+      <div class="step-title-group"><h3>ContrainteTemporelle — calculer_penalite()</h3><p>N3 : calcule la pénalité en €/min quand un camion est en retard ou dans un créneau chargé</p></div>
+    </div>
+    <div class="explain-row">
+      <div class="explain-card"><h4>Pénalité retard</h4><p>Si le créneau est dépassé : chaque minute de retard coûte une pénalité fixe (ex: 5 €/min).</p></div>
+      <div class="explain-card"><h4>Pénalité congestion</h4><p>Si le niveau de congestion est &gt; 1.0, le coût est multiplié : tarif × congestion.</p></div>
+      <div class="explain-card"><h4>Pénalité hors fenêtre</h4><p>Si une zone résidentielle est visitée la nuit → pénalité max (plainte citoyenne).</p></div>
+    </div>
+    <div class="formula">pénalité = <span class="hi">retard_min × 5.0</span> + <span class="hi">(congestion − 1.0) × 20.0</span> + <span class="hi">hors_fenetre × 100.0</span></div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">contrainte_temporelle.py — calculer_penalite()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">calculer_penalite</span>(self, camion_id: int, zone_id: int, creneau) -> float:
+    <span class="str">"""
+    Calcule la pénalité temporelle pour un triplet (camion, zone, créneau).
+    Retourne un float ≥ 0. Plus c'est élevé, moins l'affectation est souhaitable.
+    """</span>
+    penalite = <span class="num">0.0</span>
+
+    <span class="cm"># ── 1. Pénalité de congestion ───────────────────────────────────</span>
+    <span class="cm"># Si la congestion est élevée, le trajet prend plus longtemps → surcoût</span>
+    congestion = self.congestion.get((zone_id, creneau.id), <span class="num">1.0</span>)
+    <span class="kw">if</span> congestion > <span class="num">1.0</span>:
+        penalite += (congestion - <span class="num">1.0</span>) * <span class="num">20.0</span>  <span class="cm"># 20€ par niveau de congestion</span>
+
+    <span class="cm"># ── 2. Pénalité hors fenêtre horaire ────────────────────────────</span>
+    <span class="kw">if</span> zone_id <span class="kw">in</span> self.fenetres_zone:
+        debut_autorise, fin_autorise = self.fenetres_zone[zone_id]
+        <span class="kw">if</span> creneau.debut < debut_autorise:
+            retard = (debut_autorise - creneau.debut).seconds / <span class="num">60</span>
+            penalite += retard * <span class="num">5.0</span>    <span class="cm"># 5€ par minute en dehors de la fenêtre</span>
+        <span class="kw">elif</span> creneau.fin > fin_autorise:
+            retard = (creneau.fin - fin_autorise).seconds / <span class="num">60</span>
+            penalite += retard * <span class="num">5.0</span>
+
+    <span class="cm"># ── 3. Pénalité zone résidentielle la nuit ──────────────────────</span>
+    <span class="cm"># Zones interdites de nuit (22h-6h) → plainte citoyenne garantie</span>
+    ZONES_NUIT = getattr(self, <span class="str">'zones_interdites_nuit'</span>, [])
+    <span class="kw">if</span> zone_id <span class="kw">in</span> ZONES_NUIT:
+        heure_fin = creneau.fin.hour
+        <span class="kw">if</span> heure_fin >= <span class="num">22</span> <span class="kw">or</span> heure_fin < <span class="num">6</span>:
+            penalite += <span class="num">100.0</span>  <span class="cm"># pénalité maximale</span>
+
+    <span class="cm"># ── 4. Pénalité pause manquée ───────────────────────────────────</span>
+    <span class="kw">for</span> p_debut, p_fin <span class="kw">in</span> self.pauses_camion.get(camion_id, []):
+        <span class="kw">if</span> creneau.debut < p_fin <span class="kw">and</span> p_debut < creneau.fin:
+            penalite += <span class="num">50.0</span>  <span class="cm"># conflit avec pause réglementaire</span>
+
+    <span class="kw">return</span> penalite</pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- Tournee méthodes -->
+  <div class="step" id="mc2">
+    <div class="step-header">
+      <div class="step-number" style="background:#f87171;color:#07080f">2</div>
+      <div class="step-title-group"><h3>Classe Tournee — ajouter_point() & verifier_faisabilite()</h3><p>N4 : gérer l'ordre des points et valider toutes les contraintes opérationnelles</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">tournee.py — ajouter_point() + verifier_faisabilite()</span></div>
+      <pre><span class="kw">class</span> <span class="cls">Tournee</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, camion_id: int, capacite_max: float):
+        self.camion_id     = camion_id
+        self.capacite_max  = capacite_max
+        self.points        = []      <span class="cm"># liste ordonnée d'IDs (commence et finit au dépôt 0)</span>
+        self.charge_actuelle = <span class="num">0.0</span>
+        self.heure_depart  = <span class="kw">None</span>
+        self.heure_retour  = <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">ajouter_point</span>(self, point_id: int, demande: float,
+                       position: int = -<span class="num">1</span>) -> bool:
+        <span class="str">"""
+        Insère un point dans la tournée.
+        position=-1 → à la fin (avant le retour dépôt)
+        Retourne False si la capacité serait dépassée.
+        """</span>
+        <span class="cm"># Vérification capacité AVANT d'insérer</span>
+        <span class="kw">if</span> self.charge_actuelle + demande > self.capacite_max:
+            <span class="kw">return False</span>  <span class="cm"># refus : camion trop plein</span>
+
+        <span class="kw">if</span> position == -<span class="num">1</span>:
+            self.points.<span class="fn">append</span>(point_id)
+        <span class="kw">else</span>:
+            self.points.<span class="fn">insert</span>(position, point_id)
+
+        self.charge_actuelle += demande
+        <span class="kw">return True</span>  <span class="cm"># succès</span>
+
+    <span class="kw">def</span> <span class="fn">calculer_distance</span>(self, matrice: list) -> float:
+        <span class="str">"""Somme des distances entre points consécutifs (dépôt → ... → dépôt)."""</span>
+        route = [<span class="num">0</span>] + self.points + [<span class="num">0</span>]  <span class="cm"># dépôt au début et à la fin</span>
+        <span class="kw">return</span> <span class="fn">sum</span>(matrice[route[i]][route[i+<span class="num">1</span>]] <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(route)-<span class="num">1</span>))
+
+    <span class="kw">def</span> <span class="fn">calculer_duree</span>(self, temps_service: dict, vitesse_kmh: float = <span class="num">30</span>) -> float:
+        <span class="str">"""
+        Durée totale = temps trajet + temps de service à chaque point.
+        temps_service : dict { point_id : minutes }
+        """</span>
+        route = [<span class="num">0</span>] + self.points + [<span class="num">0</span>]
+        duree = <span class="num">0.0</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(route) - <span class="num">1</span>):
+            <span class="cm"># temps trajet entre deux points (en minutes)</span>
+            dist = matrice[route[i]][route[i+<span class="num">1</span>]]
+            duree += (dist / vitesse_kmh) * <span class="num">60</span>
+        <span class="kw">for</span> pt <span class="kw">in</span> self.points:
+            duree += temps_service.get(pt, <span class="num">0</span>)  <span class="cm"># temps de vidage du conteneur</span>
+        <span class="kw">return</span> duree
+
+    <span class="kw">def</span> <span class="fn">verifier_faisabilite</span>(self, contraintes: dict) -> bool:
+        <span class="str">"""
+        Vérifie TOUTES les contraintes opérationnelles.
+        contraintes = { 'capacite_max': float, 'fenetre_fin': str,
+                        'demandes': dict, 'acces': dict }
+        Retourne False dès qu'une contrainte est violée.
+        """</span>
+        <span class="cm"># 1. Contrainte capacité</span>
+        <span class="kw">if</span> self.charge_actuelle > contraintes.get(<span class="str">'capacite_max'</span>, <span class="fn">float</span>(<span class="str">'inf'</span>)):
+            <span class="kw">return False</span>
+
+        <span class="cm"># 2. Contrainte fenêtre horaire globale</span>
+        <span class="kw">if</span> self.heure_retour <span class="kw">and</span> <span class="str">'fenetre_fin'</span> <span class="kw">in</span> contraintes:
+            <span class="kw">if</span> self.heure_retour > contraintes[<span class="str">'fenetre_fin'</span>]:
+                <span class="kw">return False</span>  <span class="cm"># retour trop tardif</span>
+
+        <span class="cm"># 3. Contrainte d'accès pour chaque point</span>
+        acces = contraintes.get(<span class="str">'acces'</span>, {})
+        <span class="kw">for</span> pt <span class="kw">in</span> self.points:
+            type_acces = acces.get(pt, <span class="str">'facile'</span>)
+            <span class="kw">if</span> type_acces == <span class="str">'camion_mini'</span> <span class="kw">and</span> self.capacite_max > <span class="num">3000</span>:
+                <span class="kw">return False</span>  <span class="cm"># trop grand pour cette rue étroite</span>
+
+        <span class="kw">return True</span>  <span class="cm"># toutes les contraintes respectées</span></pre>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- recherche_tabou complet -->
+  <div class="step" id="mc3">
+    <div class="step-header">
+      <div class="step-number" style="background:#f87171;color:#07080f">3</div>
+      <div class="step-title-group"><h3>OptimiseurVRP — recherche_tabou() complète</h3><p>N4 : implémentation complète avec liste tabou, critère d'aspiration et arrêt par stagnation</p></div>
+    </div>
+    <div class="explain-row">
+      <div class="explain-card"><h4>Mouvement</h4><p>Déplacer un point d'une tournée vers une autre. Le mouvement est mémorisé dans la liste tabou.</p></div>
+      <div class="explain-card"><h4>Liste tabou</h4><p>Les 10 derniers mouvements sont interdits. Évite de revenir en arrière et de boucler.</p></div>
+      <div class="explain-card"><h4>Aspiration</h4><p>Exception : si un mouvement tabou donne la meilleure solution globale jamais vue, on l'accepte quand même.</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">optimiseur_vrp.py — recherche_tabou()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">recherche_tabou</span>(self, iterations: int = <span class="num">100</span>,
+                       taille_tabou: int = <span class="num">10</span>,
+                       stagnation_max: int = <span class="num">15</span>) -> list:
+    <span class="str">"""
+    Optimisation globale par Recherche Tabou.
+    Retourne la meilleure liste de Tournee trouvée.
+    """</span>
+    <span class="cm"># ── Initialisation ──────────────────────────────────────────────</span>
+    tournees_actuelles = self.<span class="fn">construire_solution_initiale</span>()
+    <span class="cm"># Appliquer 2-opt sur chaque tournée pour partir d'une bonne base</span>
+    tournees_actuelles = [self.<span class="fn">algorithme_2opt</span>(t) <span class="kw">for</span> t <span class="kw">in</span> tournees_actuelles]
+
+    meilleure_solution  = [t.<span class="fn">copie</span>() <span class="kw">for</span> t <span class="kw">in</span> tournees_actuelles]
+    meilleur_cout       = self.<span class="fn">_cout_total</span>(meilleure_solution)
+    liste_tabou         = []   <span class="cm"># [(tournee_src, tournee_dst, point_id)]</span>
+    stagnation          = <span class="num">0</span>
+
+    <span class="kw">for</span> it <span class="kw">in</span> <span class="fn">range</span>(iterations):
+        <span class="cm"># ── Critère d'arrêt anticipé ────────────────────────────────</span>
+        <span class="kw">if</span> stagnation >= stagnation_max:
+            <span class="kw">break</span>
+
+        meilleur_voisin = <span class="kw">None</span>
+        meilleur_delta  = <span class="fn">float</span>(<span class="str">'inf'</span>)
+        meilleur_mouvement = <span class="kw">None</span>
+
+        <span class="cm"># ── Explorer les voisins (déplacer un point entre tournées) ──</span>
+        <span class="kw">for</span> i_src, t_src <span class="kw">in</span> <span class="fn">enumerate</span>(tournees_actuelles):
+            <span class="kw">for</span> point_id <span class="kw">in</span> t_src.points:
+                <span class="kw">for</span> i_dst, t_dst <span class="kw">in</span> <span class="fn">enumerate</span>(tournees_actuelles):
+                    <span class="kw">if</span> i_src == i_dst: <span class="kw">continue</span>
+
+                    mouvement = (i_src, i_dst, point_id)
+                    est_tabou = mouvement <span class="kw">in</span> liste_tabou
+
+                    <span class="cm"># Simuler le mouvement</span>
+                    delta = self.<span class="fn">_evaluer_mouvement</span>(tournees_actuelles,
+                                                    i_src, i_dst, point_id)
+
+                    cout_voisin = self.<span class="fn">_cout_total</span>(tournees_actuelles) + delta
+
+                    <span class="cm"># ── Critère d'aspiration : accepter si meilleur global ──</span>
+                    aspiration_ok = cout_voisin < meilleur_cout
+
+                    <span class="kw">if</span> (not est_tabou <span class="kw">or</span> aspiration_ok) <span class="kw">and</span> delta < meilleur_delta:
+                        meilleur_delta     = delta
+                        meilleur_mouvement = mouvement
+                        meilleur_voisin    = (i_src, i_dst, point_id)
+
+        <span class="kw">if</span> meilleur_voisin <span class="kw">is None</span>:
+            <span class="kw">break</span>  <span class="cm"># aucun mouvement possible</span>
+
+        <span class="cm"># ── Appliquer le meilleur mouvement ─────────────────────────</span>
+        i_src, i_dst, point_id = meilleur_voisin
+        self.<span class="fn">_appliquer_mouvement</span>(tournees_actuelles, i_src, i_dst, point_id)
+
+        <span class="cm"># ── Mettre à jour liste tabou (FIFO, taille limitée) ────────</span>
+        liste_tabou.<span class="fn">append</span>(meilleur_mouvement)
+        <span class="kw">if</span> <span class="fn">len</span>(liste_tabou) > taille_tabou:
+            liste_tabou.<span class="fn">pop</span>(<span class="num">0</span>)  <span class="cm"># supprimer le plus vieux</span>
+
+        <span class="cm"># ── Mise à jour de la meilleure solution globale ─────────────</span>
+        cout_actuel = self.<span class="fn">_cout_total</span>(tournees_actuelles)
+        <span class="kw">if</span> cout_actuel < meilleur_cout:
+            meilleur_cout      = cout_actuel
+            meilleure_solution = [t.<span class="fn">copie</span>() <span class="kw">for</span> t <span class="kw">in</span> tournees_actuelles]
+            stagnation         = <span class="num">0</span>   <span class="cm"># amélioration → remettre compteur à 0</span>
+        <span class="kw">else</span>:
+            stagnation += <span class="num">1</span>         <span class="cm"># pas d'amélioration → incrémenter stagnation</span>
+
+    <span class="kw">return</span> meilleure_solution</pre>
+    </div>
+    <div class="callout tip"><span class="callout-icon">✅</span><span><strong>Critère d'arrêt :</strong> 100 itérations max <strong>OU</strong> 15 itérations sans amélioration (stagnation). Le deuxième est souvent déclenché en premier, ce qui accélère l'exécution.</span></div>
+  </div>
+  <hr class="divider">
+
+  <!-- Dashboard & Replanification -->
+  <div class="step" id="mc4">
+    <div class="step-header">
+      <div class="step-number" style="background:#f87171;color:#07080f">4</div>
+      <div class="step-title-group"><h3>Dashboard & replanifier_urgence()</h3><p>N5 : le dashboard temps réel et la replanification d'urgence en &lt; 2 secondes</p></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">simulateur_temps_reel.py — replanifier_urgence()</span></div>
+      <pre><span class="kw">def</span> <span class="fn">replanifier_urgence</span>(self, points_urgents: list) -> list:
+    <span class="str">"""
+    Insère les points urgents en tête des tournées en cours.
+    Stratégie : trouver le camion le plus proche de chaque point urgent.
+    Doit s'exécuter en < 2 secondes (pas de Tabou, insertion directe).
+    """</span>
+    <span class="kw">import</span> time
+    debut = time.<span class="fn">time</span>()
+
+    <span class="kw">for</span> point_urgent_id <span class="kw">in</span> points_urgents:
+        <span class="cm"># Trouver le camion le plus proche du point urgent</span>
+        meilleur_camion, distance_min = <span class="kw">None</span>, <span class="fn">float</span>(<span class="str">'inf'</span>)
+
+        <span class="kw">for</span> tournee <span class="kw">in</span> self.tournees_en_cours:
+            <span class="cm"># Position actuelle = dernier point visité de la tournée</span>
+            pos_actuelle = tournee.position_actuelle <span class="kw">if</span> tournee.points <span class="kw">else</span> <span class="num">0</span>
+            dist = self.graphe.matrice[pos_actuelle][point_urgent_id]
+
+            <span class="kw">if</span> dist < distance_min:
+                distance_min  = dist
+                meilleur_camion = tournee
+
+        <span class="cm"># Insérer en PREMIÈRE position de la tournée restante</span>
+        <span class="kw">if</span> meilleur_camion <span class="kw">is not None</span>:
+            meilleur_camion.points.<span class="fn">insert</span>(<span class="num">0</span>, point_urgent_id)
+            self.evenements.<span class="fn">append</span>({
+                <span class="str">'type'</span>: <span class="str">'replanification'</span>,
+                <span class="str">'point'</span>: point_urgent_id,
+                <span class="str">'camion'</span>: meilleur_camion.camion_id,
+                <span class="str">'temps_reponse_s'</span>: <span class="fn">round</span>(time.<span class="fn">time</span>() - debut, <span class="num">3</span>)
+            })
+
+    <span class="kw">return</span> self.tournees_en_cours</pre>
+    </div>
+    <div class="code-box">
+      <div class="code-header"><div class="code-dot" style="background:#ef4444"></div><div class="code-dot" style="background:#f59e0b"></div><div class="code-dot" style="background:#4ade80"></div><span class="code-filename">dashboard_temps_reel.py — DashboardTempsReel</span></div>
+      <pre><span class="kw">class</span> <span class="cls">DashboardTempsReel</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, simulateur):
+        self.simulateur = simulateur
+        self.metrics = {
+            <span class="str">'co2_total'</span>: <span class="num">0.0</span>, <span class="str">'cout_total'</span>: <span class="num">0.0</span>,
+            <span class="str">'satisfaction'</span>: <span class="num">100.0</span>, <span class="str">'points_urgents'</span>: []
+        }
+
+    <span class="kw">def</span> <span class="fn">mettre_a_jour</span>(self) -> None:
+        <span class="str">"""Recalcule tous les indicateurs à partir de l'état courant."""</span>
+        tournees = self.simulateur.tournees_en_cours
+        capteurs  = self.simulateur.capteurs
+
+        <span class="cm"># CO2 accumulé (0.3 kg / km parcouru)</span>
+        dist_totale = <span class="fn">sum</span>(t.<span class="fn">calculer_distance</span>(self.simulateur.graphe.matrice)
+                        <span class="kw">for</span> t <span class="kw">in</span> tournees)
+        self.metrics[<span class="str">'co2_total'</span>] += dist_totale * <span class="num">0.3</span>
+
+        <span class="cm"># Coût cumulé (carburant + fixe)</span>
+        self.metrics[<span class="str">'cout_total'</span>] += dist_totale * <span class="num">0.5</span>
+
+        <span class="cm"># Points urgents (niveau > 90%)</span>
+        self.metrics[<span class="str">'points_urgents'</span>] = [
+            c.point_id <span class="kw">for</span> c <span class="kw">in</span> capteurs.values() <span class="kw">if</span> c.<span class="fn">detecter_urgence</span>()
+        ]
+
+        <span class="cm"># Satisfaction : baisse si retards ou urgences non traitées</span>
+        nb_urgents = <span class="fn">len</span>(self.metrics[<span class="str">'points_urgents'</span>])
+        self.metrics[<span class="str">'satisfaction'</span>] = <span class="fn">max</span>(<span class="num">0</span>, <span class="num">100</span> - nb_urgents * <span class="num">5</span>)
+
+    <span class="kw">def</span> <span class="fn">generer_rapport</span>(self, periode: str = <span class="str">"journalier"</span>) -> dict:
+        <span class="str">"""Génère un rapport récapitulatif de la période."""</span>
+        <span class="kw">return</span> {
+            <span class="str">'periode'</span>: periode,
+            <span class="str">'co2_total_kg'</span>: <span class="fn">round</span>(self.metrics[<span class="str">'co2_total'</span>], <span class="num">2</span>),
+            <span class="str">'cout_total_euros'</span>: <span class="fn">round</span>(self.metrics[<span class="str">'cout_total'</span>], <span class="num">2</span>),
+            <span class="str">'satisfaction_moyenne'</span>: self.metrics[<span class="str">'satisfaction'</span>],
+            <span class="str">'points_urgents_traites'</span>: <span class="fn">len</span>(self.metrics[<span class="str">'points_urgents'</span>]),
+            <span class="str">'evenements'</span>: self.simulateur.evenements
+        }
+
+    <span class="kw">def</span> <span class="fn">alerter_operateur</span>(self, type_alerte: str, severite: int) -> None:
+        <span class="str">"""
+        Envoie une alerte (console / log / notification).
+        severite : 1=info, 2=avertissement, 3=critique
+        """</span>
+        niveau_txt = [<span class="str">'INFO'</span>, <span class="str">'WARN'</span>, <span class="str">'CRIT'</span>][<span class="fn">min</span>(severite-<span class="num">1</span>, <span class="num">2</span>)]
+        msg = <span class="fn">f</span><span class="str">"[{niveau_txt}] {type_alerte} — heure: {self.simulateur.heure_actuelle}"</span>
+        <span class="fn">print</span>(msg)  <span class="cm"># remplacer par logger.warning(msg) en production</span>
+
+        <span class="kw">if</span> severite == <span class="num">3</span>:  <span class="cm"># critique → déclencher replanification immédiate</span>
+            urgents = self.metrics[<span class="str">'points_urgents'</span>]
+            <span class="kw">if</span> urgents:
+                self.simulateur.<span class="fn">replanifier_urgence</span>(urgents)</pre>
+    </div>
+    <div class="callout tip"><span class="callout-icon">✅</span><span><strong>Test 5.3 :</strong> la replanification doit prendre &lt; 2 minutes. La méthode <code>replanifier_urgence()</code> utilise une insertion directe O(n×m) — beaucoup plus rapide que de relancer la Recherche Tabou (qui prendrait plusieurs minutes).</span></div>
+    <div class="quiz-box">
+      <div class="quiz-q">❓ Pourquoi ne pas relancer la Recherche Tabou complète lors d'une urgence ?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅐 Parce que la Tabou ne peut pas gérer les urgences</div>
+        <div class="quiz-opt" onclick="quiz(this,'correct')">🅑 Parce qu'elle prend trop de temps — l'urgence exige une réponse en &lt; 2 secondes</div>
+        <div class="quiz-opt" onclick="quiz(this,'wrong')">🅒 Parce que la solution serait moins bonne qu'une insertion directe</div>
+      </div>
+      <div class="quiz-feedback" id="qfb-mc">✅ <strong>Exact !</strong> La Recherche Tabou (100 iterations) peut prendre 10–30s selon l'instance. En mode urgence, on sacrifie l'optimalité au profit de la <strong>rapidité</strong> : insertion greedy du point urgent dans la tournée du camion le plus proche.</div>
+    </div>
+  </div>
+</section>
+
+</div>
+</main>
+</div>
+
+<script src="js/explication_script.js"></script>
+</body>
+</html>
