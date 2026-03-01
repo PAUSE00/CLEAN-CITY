@@ -2,22 +2,9 @@
 // Script to run on Railway to update lat/lng coordinates for Agadir points
 // Center: 30.4277, -9.5981
 
-$host = getenv('MYSQLHOST');
-$user = getenv('MYSQLUSER');
-$pass = getenv('MYSQLPASSWORD');
-// Extract db name from MYSQL_URL if MYSQL_DATABASE is not set by Railway
-$url = getenv('MYSQL_URL');
-$db = 'railway'; // default for railway
-if ($url && preg_match('/\/([^\/]+)$/', $url, $matches)) {
-    $db = parse_url($url, PHP_URL_PATH);
-    $db = str_replace('/', '', $db);
-}
+require_once 'api/config/db.php'; // Use the established connection logic
 
 try {
-    $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-    $pdo = new PDO($dsn, $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
     // Some approximate coordinates around Agadir for the 10 points
     // 0: Dépôt (Center) -> 30.4277, -9.5981
     // 1: Quartier Nord -> 30.4400, -9.6000
@@ -49,5 +36,5 @@ try {
 
     echo "Successfully updated lat/lng coordinates in the database!";
 } catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
+    echo "Connection or Update failed: " . $e->getMessage();
 }
