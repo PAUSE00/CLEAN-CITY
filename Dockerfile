@@ -12,9 +12,12 @@ COPY . /var/www/html/
 # Hardcode Apache to listen on port 8080 instead of 80
 RUN sed -i 's/80/8080/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# Fix MPM configuration error the correct Debian way
-RUN a2dismod mpm_event mpm_worker || true \
-    && a2enmod mpm_prefork || true
+# To bypass the "More than one MPM loaded" error that Railway's environment 
+# seems to trigger with apache2-foreground, we will use a simple script 
+# to start Apache gracefully in the background, and then keep the container alive.
+RUN printf '#!/bin/bash\nservice apache2 start\ntail -f /var/log/apache2/error.log\n' > /start.sh && chmod +x /start.sh
 
-# Expose port 8080 so Railway knows exactly where to route traffic
+# Expose port 8080
 EXPOSE 8080
+
+CMD ["/start.sh"]
