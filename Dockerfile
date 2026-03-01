@@ -1,13 +1,16 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# Install PDO MySQL to connect to Railway Database
+# Install PDO MySQL extension
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Copy all project files to the web directory
-COPY . /var/www/html/
+# Set working directory
+WORKDIR /app
 
-# Enable Apache rewrite module
-RUN a2enmod rewrite
+# Copy all application files
+COPY . .
 
-# Use shell form CMD so $PORT is expanded at runtime by /bin/sh
-CMD sed -i "s/80/$PORT/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && apache2-foreground
+# Expose port (Railway sets PORT dynamically)
+EXPOSE ${PORT:-8080}
+
+# Use shell form so $PORT is expanded by sh at runtime
+CMD php -S 0.0.0.0:$PORT
