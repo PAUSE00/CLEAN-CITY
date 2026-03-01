@@ -9,8 +9,5 @@ COPY . /var/www/html/
 # Enable Apache rewrite module
 RUN a2enmod rewrite
 
-# Create startup script inline (avoids CRLF issues from Windows)
-RUN printf '#!/bin/bash\nsed -i "s/80/${PORT}/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf\napache2-foreground\n' > /start.sh && chmod +x /start.sh
-
-# Use the startup script which properly expands the $PORT variable
-CMD ["/bin/bash", "/start.sh"]
+# Use shell form CMD so $PORT is expanded at runtime by /bin/sh
+CMD sed -i "s/80/$PORT/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && apache2-foreground
