@@ -12,9 +12,9 @@ COPY . /var/www/html/
 # Hardcode Apache to listen on port 8080 instead of 80
 RUN sed -i 's/80/8080/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# Fix MPM configuration error by ensuring only mpm_prefork is loaded 
-# (php:8.2-apache already enables mpm_prefork, but sometimes local files conflict)
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.conf /etc/apache2/mods-enabled/mpm_worker.conf /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_worker.load
+# Fix MPM configuration error the correct Debian way
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork || true
 
 # Expose port 8080 so Railway knows exactly where to route traffic
 EXPOSE 8080
